@@ -1,6 +1,8 @@
 Easyfig
 =======
 
-This is the development version of Easyfig.
+This is the migrated version of Easyfig
 
-To download the binaries, read the manual please visit http://easyfig.sourceforge.net/
+Please visit [files](http://mjsull.github.io/Easyfig/files.html) to download Easyfig binaries and the manual.
+
+Please visit [the wiki](https://github.com/mjsull/Easyfig/wiki/Tutorials) for a tutorial.
