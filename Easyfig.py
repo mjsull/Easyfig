@@ -5488,24 +5488,48 @@ ffffffffffffffffffff'
         self.plotPoint(cx + y, cy - x)
 
 # method for creating gif string
-  def createGIFString(self):
+  def createGIFString(self, oneistone):
+        if not oneistone:
+            if self.wd > 1000:
+                modifier = 1000.0 / self.wd
+                self.wd = 1000
+                self.ht = int(self.ht * modifier)
+            else:
+                oneistone = True
         binarystring = 'GIF89a' # header
         binarystring += struct.pack('h', self.wd) + struct.pack('h', self.ht) + chr(int('10010110', 2)) + '\x00\x00'
-        for i in range(8): # 128 colour table
-            for j in range(4):
-                for k in range(4):
-                    binarystring += chr(int(i*35.42)) + chr(j*85) + chr(k*85)
+        if len(self.palette) <= 128:
+            for i in self.palette:
+                colour = Color.fromLong(i)
+                binarystring += chr(colour.red) + chr(colour.grn) + chr(colour.blu)
+            for i in range(128 - len(self.palette)):
+                binarystring += chr(255) + chr(255) + chr(255)
+        else:
+            for i in range(8): # 128 colour table
+                for j in range(4):
+                    for k in range(4):
+                        binarystring += chr(int(i*35.42)) + chr(j*85) + chr(k*85)
         binarystring += ',\x00\x00\x00\x00' + struct.pack('h', self.wd) + struct.pack('h', self.ht) + '\x00' # image descriptor
         binarystring += '\x07' # LZW Minimum code size
         pixstring = ''
         self.bitarray.reverse()
-        for i in self.bitarray:
-            for j in i:
-                colourhash = self.palette[j]
-                colour = Color.fromLong(colourhash)
-                r, g, b = colour.red / 35, colour.grn / 85, colour.blu / 85
-                colbin = '0' + "{0:b}".format(r).zfill(3) + "{0:b}".format(g).zfill(2) + "{0:b}".format(b).zfill(2)
-                pixstring += chr(int(colbin, 2))
+        for a, i in enumerate(self.bitarray):
+            for b, j in enumerate(i):
+                if len(self.palette) <= 128:
+                    if oneistone:
+                        pixstring += chr(j)
+                    else:
+                        if (int(a*modifier) != int((a-1) * modifier) or a == 0) and (int(b*modifier) != int((b-1)*modifier) or b == 0):
+                            pixstring += chr(j)
+                else:
+                    colourhash = self.palette[j]
+                    colour = Color.fromLong(colourhash)
+                    colbin = '0' + "{0:b}".format(colour.red).zfill(3) + "{0:b}".format(colour.grn).zfill(2) + "{0:b}".format(colour.blu).zfill(2)
+                    if oneistone:
+                        pixstring += chr(int(colbin, 2))
+                    else:
+                        if (int(a*modifier) != int((a-1) * modifier) or a == 0) and (int(b*modifier) != int((b-1)*modifier) or b == 0):
+                            pixstring += chr(int(colbin, 2))
         for i in range(0, len(pixstring), 8):
             binarystring += '\x09\x80' + pixstring[i:i+8]
         binarystring += '\x01\x81'
@@ -5991,7 +6015,7 @@ def getBlast(filename, minlength, mineval, minident):
 def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
          compress, reverseList, featDict, glt, exont, genet, featlengths, aln,
-         graphit, blastoutline, minmaxlist, autodetect, legend, legname, writebmp=True):
+         graphit, blastoutline, minmaxlist, autodetect, legend, legname, writebmp=0):
     # global variable for stopping script midway
     global abortCaptain
     secondlist = []
@@ -6864,11 +6888,13 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                         bmp.setPenColor(Color.BLACK)
                     bmp.drawLine(x1s, y1, x2s, y2)
                     bmp.drawLine(x1e, y1, x2e, y2)
-    if writebmp:
+    if writebmp == 0:
         bmp.saveFile(filename, compress)
         return minident
-    else:
-        return bmp.createGIFString(), minident, bmp.wd, bmp.ht
+    elif writebmp == 1:
+        return bmp.createGIFString(True), minident, bmp.wd, bmp.ht
+    elif writebmp == 2:
+        return bmp.createGIFString(False), minident, bmp.wd, bmp.ht
 
 def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
@@ -7766,7 +7792,7 @@ class App:
         self.filetype = StringVar(value='Bitmap (bmp)')
         self.filetypelabel = Label(frame1, text='File type:')
         self.filetypelabel.grid(row=18, column=2, columnspan=2, pady=5, sticky=W)
-        self.filetypeentry = OptionMenu(frame1, self.filetype, 'Bitmap (bmp)', 'Vector file (svg)', 'Preview')
+        self.filetypeentry = OptionMenu(frame1, self.filetype, 'Bitmap (bmp)', 'Vector file (svg)', 'Preview (shrink)', 'Preview (1:1)')
         self.filetypeentry.grid(row=18, column=2, columnspan=2, pady=5)
         self.createFigure = Button(frame1, text="Create Figure", font='TkDefaultFont 12 bold', width=20, command=self.makeFigure)
         self.createFigure.grid(row=19, column=2, columnspan=2, rowspan=3, sticky='NS')
@@ -9427,9 +9453,9 @@ Please do not hesitate to email with issues or bug reports.')
 
     def makeFigure(self):
         global abortCaptain
-        if self.outfile.get() == '' and not self.filetype.get() == 'Preview':
+        if self.outfile.get() == '' and not self.filetype.get().startswith('Preview'):
             self.getoutfile()
-        if self.outfile.get() == '' and not self.filetype.get() == 'Preview':
+        if self.outfile.get() == '' and not self.filetype.get().startswith('Preview'):
             return None
         try:
             if self.thegenblast.isAlive():
@@ -9738,12 +9764,20 @@ Please do not hesitate to email with issues or bug reports.')
         except:
             pass
         theoutfile = None
-        testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
-                self.inputlist, self.figwidth, self.height1, self.height2,
-                self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
-                False, self.compress, self.reverseList, self.featDict, self.glt,
-                self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
-                self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), False)
+        if self.filetype.get() == 'Preview (1:1)':
+            testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
+                    self.inputlist, self.figwidth, self.height1, self.height2,
+                    self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
+                    False, self.compress, self.reverseList, self.featDict, self.glt,
+                    self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
+                    self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), 1)
+        else:
+           testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
+                    self.inputlist, self.figwidth, self.height1, self.height2,
+                    self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
+                    False, self.compress, self.reverseList, self.featDict, self.glt,
+                    self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
+                    self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), 2)
         self.prevwindow = Toplevel()
         self.prevwindow.title('Preview')
         self.prevframe = Frame(self.prevwindow)
