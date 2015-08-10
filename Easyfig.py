@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.1.1 24.04.2012
+# Version 2.2.0 24.04.2012
 # License: GPLv3
 
 from Tkinter import *
@@ -14,7 +14,8 @@ import subprocess
 from math import ceil, hypot
 import threading
 import time
-import array
+import struct
+import base64
 import string
 from ftplib import FTP
 import tarfile
@@ -54,8 +55,60 @@ class scalableVectorGraphics:
     def __init__(self, height, width):
         self.height = height
         self.width = width
-        self.out = '<?xml version="1.0"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"\n    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\n\n">'
-        self.out += '<svg height="%d" width="%d" >\n<title>Easyfig</title>\n <g style="fill-opacity:1.0; stroke:black; stroke-width:1;">\n' % (self.height, self.width)
+        self.out = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="%d"
+   width="%d"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="easyfig">
+  <metadata
+     id="metadata122">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Easyfig</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs120" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview118"
+     showgrid="false"
+     inkscape:zoom="0.0584"
+     inkscape:cx="2500"
+     inkscape:cy="75.5"
+     inkscape:window-x="55"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <title
+     id="title4">Easyfig</title>
+  <g
+     style="fill-opacity:1.0; stroke:black; stroke-width:1;"
+     id="g6">''' % (self.height, self.width)
 
     def drawLine(self, x1, y1, x2, y2, th=1, cl=(0, 0, 0)):
         self.out += '  <line x1="%d" y1="%d" x2="%d" y2="%d"\n        stroke-width="%d" stroke="%s" />\n' % (x1, y1, x2, y2, th, colorstr(cl))
@@ -5434,26 +5487,30 @@ ffffffffffffffffffff'
         self.plotPoint(cx - x, cy + y)
         self.plotPoint(cx + y, cy - x)
 
-# class for creating a PPM string, Tkinter unforutantely is a bit tempramental
-# with PPM strings so it is not implemented. Was intended for easyfig to show a preview
-# of your figure.
-# If anyone is actually looking at the source code and knows of a python script for
-# making GIF files, please share.
-  def createPPMString(self):
-    ppmstring = 'P6\n'
-    ppmstring += str(self.wd) + ' '
-    ppmstring += str(self.ht) + '\n'
-    ppmstring += '255\n'
-    thearray = self.bitarray[:]
-    thearray.reverse()
-    for row in thearray:
-        for pixel in row:
-            colourhash = self.palette[pixel]
-            colour = Color.fromLong(colourhash)
-            ppmstring += chr(colour.red) + chr(colour.grn) + chr(colour.blu)
-    return ppmstring
-
-
+# method for creating gif string
+  def createGIFString(self):
+        binarystring = 'GIF89a' # header
+        binarystring += struct.pack('h', self.wd) + struct.pack('h', self.ht) + chr(int('10010110', 2)) + '\x00\x00'
+        for i in range(8): # 128 colour table
+            for j in range(4):
+                for k in range(4):
+                    binarystring += chr(int(i*35.42)) + chr(j*85) + chr(k*85)
+        binarystring += ',\x00\x00\x00\x00' + struct.pack('h', self.wd) + struct.pack('h', self.ht) + '\x00' # image descriptor
+        binarystring += '\x07' # LZW Minimum code size
+        pixstring = ''
+        self.bitarray.reverse()
+        for i in self.bitarray:
+            for j in i:
+                colourhash = self.palette[j]
+                colour = Color.fromLong(colourhash)
+                r, g, b = colour.red / 35, colour.grn / 85, colour.blu / 85
+                colbin = '0' + "{0:b}".format(r).zfill(3) + "{0:b}".format(g).zfill(2) + "{0:b}".format(b).zfill(2)
+                pixstring += chr(int(colbin, 2))
+        for i in range(0, len(pixstring), 8):
+            binarystring += '\x09\x80' + pixstring[i:i+8]
+        binarystring += '\x01\x81'
+        binarystring += '\x00;'
+        return base64.b64encode(binarystring)
 
 
   def _saveBitMapNoCompression( self, filename ):
@@ -5626,6 +5683,8 @@ def getArrows(filename, legname):
     getgenseq = False
     getmultifasta = False
     for line in genbank:
+        if '\t' in line:
+            sys.stderr.write('Tab found in genbank file, this may cause some Features to be missed, please remove tabs.')
         if line.startswith('FEATURES') or line.startswith('     source'):
             getFeats = True
         elif line.startswith('FT'):
@@ -5932,7 +5991,7 @@ def getBlast(filename, minlength, mineval, minident):
 def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
          compress, reverseList, featDict, glt, exont, genet, featlengths, aln,
-         graphit, blastoutline, minmaxlist, autodetect, legend, legname):
+         graphit, blastoutline, minmaxlist, autodetect, legend, legname, writebmp=True):
     # global variable for stopping script midway
     global abortCaptain
     secondlist = []
@@ -6805,8 +6864,11 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                         bmp.setPenColor(Color.BLACK)
                     bmp.drawLine(x1s, y1, x2s, y2)
                     bmp.drawLine(x1e, y1, x2e, y2)
-    bmp.saveFile(filename, compress)
-    return minident
+    if writebmp:
+        bmp.saveFile(filename, compress)
+        return minident
+    else:
+        return bmp.createGIFString(), minident, bmp.wd, bmp.ht
 
 def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
@@ -7659,7 +7721,7 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.1', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 2.2.0', font='TkDefaultFont 24 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
         self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
@@ -8314,7 +8376,7 @@ class App:
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.1\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 2.2.0\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
@@ -9365,9 +9427,9 @@ Please do not hesitate to email with issues or bug reports.')
 
     def makeFigure(self):
         global abortCaptain
-        if self.outfile.get() == '':
+        if self.outfile.get() == '' and not self.filetype.get() == 'Preview':
             self.getoutfile()
-        if self.outfile.get() == '':
+        if self.outfile.get() == '' and not self.filetype.get() == 'Preview':
             return None
         try:
             if self.thegenblast.isAlive():
@@ -9668,21 +9730,47 @@ Please do not hesitate to email with issues or bug reports.')
                             self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
                             self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get())
         else:
-            self.getPreview()
+            self.theminblast = self.getPreview()
     
     def getPreview(self):
         try:
             self.prevwindow.destroy()
         except:
             pass
+        theoutfile = None
+        testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
+                self.inputlist, self.figwidth, self.height1, self.height2,
+                self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
+                False, self.compress, self.reverseList, self.featDict, self.glt,
+                self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
+                self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), False)
         self.prevwindow = Toplevel()
         self.prevwindow.title('Preview')
-        self.prefframe = Frame(self.prevwindow)
+        self.prevframe = Frame(self.prevwindow)
+        self.prevwindow.grid_rowconfigure(0, weight=1)
+        self.prevwindow.grid_columnconfigure(0, weight=1)
         self.prevwindow.geometry('+30+40')
-        self.prevframe.grid(padx=30, pady=10)
-    
-   
-        self.previewTL = TopLevel
+        self.prevframe.grid(row=0, column=0, sticky=NSEW)
+        self.prevframe.grid_rowconfigure(0, weight=1)
+        self.prevframe.grid_columnconfigure(0, weight=1)
+        xscrollbar = Scrollbar(self.prevframe, orient=HORIZONTAL)
+        xscrollbar.grid(row=1, column=0, sticky=E+W)
+        yscrollbar = Scrollbar(self.prevframe)
+        yscrollbar.grid(row=0, column=1, sticky=N+S)
+        self.canvas = Canvas(self.prevframe, bd=0, bg='#000000', scrollregion=(0, 0, width, height),
+                        xscrollcommand=xscrollbar.set,
+                        yscrollcommand=yscrollbar.set)
+        test = PhotoImage(data=testit)
+        self.canvas.create_image(0, 0, image=test, anchor=NW)
+        self.canvas.grid(row=0, column=0, sticky=NSEW)
+        self.canvas.image = test
+        xscrollbar.config(command=self.canvas.xview)
+        yscrollbar.config(command=self.canvas.yview)
+        #label = Label(self.prevframe, image=test)
+        #label.image = test
+        #label.grid()
+        #self.canvas.image = test
+        return self.theminblast
 
     def gbk2fasta(self, genbank, out, mincut, maxcut):
         getseq = False
