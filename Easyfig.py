@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.2.0 24.04.2012
+# Version 2.2.1 10.08.2015
 # License: GPLv3
 
 from Tkinter import *
@@ -7747,7 +7747,7 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.2.0', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 2.2.1', font='TkDefaultFont 24 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
         self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
@@ -8402,7 +8402,7 @@ class App:
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.2.0\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 2.2.1\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
