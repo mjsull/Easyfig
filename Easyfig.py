@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.2.1 10.08.2015
+# Version 2.2.2 10.08.2015
 # License: GPLv3
 
-from Tkinter import *
 import tkFileDialog
 import tkMessageBox
 import tkSimpleDialog
@@ -23,6 +22,7 @@ import platform
 import shutil
 import webbrowser
 import operator
+import sys
 
 
 def colorstr(rgb): return "#%x%x%x" % (rgb[0]/16,rgb[1]/16,rgb[2]/16)
@@ -6068,7 +6068,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                                 thirdlist.append(aninstance)
                     elif minmaxopt == 2:
                         if temp[0] == None:
-                            templength = featlength[i/2]
+                            templength = featlengths[i/2]
                         else:
                             templength = temp[0]
                         if type(j.start) == int:
@@ -7668,31 +7668,6 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
     return minident
 
 # The GUI
-class DDlistbox(Listbox):
-    def __init__(self, master, **kw):
-        kw['selectmode'] = SINGLE
-        Listbox.__init__(self, master, kw)
-        self.bind('<Button-1>', self.setCurrent)
-        self.bind('<B1-Motion>', self.shiftSelection)
-        self.curIndex = None
-    def setCurrent(self, event):
-        self.curIndex = self.nearest(event.y)
-    def shiftSelection(self, event):
-        i = self.nearest(event.y)
-        if i < self.curIndex:
-            x = self.get(i)
-            self.delete(i)
-            self.insert(i+1, x)
-            self.curIndex = i
-        elif i > self.curIndex:
-            x = self.get(i)
-            self.delete(i)
-            self.insert(i-1, x)
-            self.curIndex = i
-
-        
-
-
 class App:
     def __init__(self, master):
         self.pwd = os.getcwd()
@@ -7747,7 +7722,7 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.2.1', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 2.2.2', font='TkDefaultFont 24 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
         self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
@@ -8402,7 +8377,7 @@ class App:
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.2.1\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 2.2.2\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
@@ -10726,9 +10701,475 @@ clicking ok will bring up\nthe download location\nin your browser.')
             
 
 global abortCaptain
+
+
+
+minlength = 0
+mineval = 0.001
+minIdent = 0
+inputlist = []
+width = 5000
+height1 = 50
+height2 = 100
+minblastc = (200, 200, 200)
+maxblastc = (100, 100, 100)
+minblastci = (200, 200, 200)
+maxblastci = (100, 100, 100)
+drawfig1 = False
+drawfig2 = False
+drawfig3 = False
+compress = True
+reverseList = []
+featDict = {}
+glt = 5
+exont = 2
+genet = 1
+featlengths = []
+aln = 'centre'
+graphit = None
+blastoutline = True
+minmaxlist = []
+getgc = False
+getgcskew = False
+getcoverage = False
+getcustom = False
+windsize = 1000
+step = 1000
+graphit = None
+multigraph = True
+loggraph = False
+gtype = 'Histogram'
+axisthick = 1
+pvc = (255, 0, 0)
+nvc = (0, 0, 255)
+ggap = 10
+gheight = 50
+blastit = True
+tblastit = False
+blastfiles = None
+lastflag = 1
+filename = None
+svg = False
+filter = False
+nofeat = False
+gmaxy = 'Auto'
+legend = 'None'
+legname = 'gene'
 abortCaptain = False
-root = Tk()
-root.title('Easyfig.py')
-root.option_add('*Font', 'TkDefaultFont 12')
-app = App(root)
-root.mainloop()
+
+if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sys.argv[1] != '-help':
+    for i in range(1,len(sys.argv)):
+        if sys.argv[i][:1] == '-':
+            lastflag = i + 2
+        if sys.argv[i] == '-o':
+            filename = sys.argv[i+1]
+        elif sys.argv[i] == '-e':
+            mineval = float(sys.arg[i+1])
+        elif sys.argv[i] == '-min_length':
+            minlength = int(sys.argv[i+1])
+        elif sys.argv[i] == '-i':
+            minIdent == float(sys.argv[i+1])
+        elif sys.argv[i] == '-width':
+            width = int(sys.argv[i+1])
+        elif sys.argv[i] == '-ann_height':
+            height1 = int((sys.argv[i+1]))
+        elif sys.argv[i] == '-blast_height':
+            height2 = int((sys.argv[i+1]))
+        elif sys.argv[i] == '-f1':
+            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
+                drawfig1 = True
+            elif sys.argv[i+1] == 'F' or sys.argv[i+1] == 'f' or sys.argv[i+1] == 'False' or sys.argv[i+1] == 'false':
+                drawfig1 = False
+        elif sys.argv[i] == '-f2':
+            drawfig2 = int(sys.argv[i+1])
+        elif sys.argv[i] == '-f3':
+            drawfig3 = sys.argv[i+1]
+        elif sys.argv[i] == '-uncomp':
+            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
+                compress = False
+        elif sys.argv[i] == '-blastn':
+            blastit = True
+            lastflag -= 1
+        elif sys.argv[i] == '-tblastx':
+            tblastit = True
+            blastit = False
+            lastflag -= 1
+        elif sys.argv[i] == '-blast_files':
+            blastit = False
+            blastfiles = i
+        elif sys.argv[i] == '-blast_col':
+            if sys.argv[i+ 1].isdigit():
+                lastflag = i+7
+                t1 = int(sys.argv[i+1])
+                t2 = int(sys.argv[i+2])
+                t3 = int(sys.argv[i+3])
+                t4 = int(sys.argv[i+4])
+                t5 = int(sys.argv[i+5])
+                t6 = int(sys.argv[i+6])
+            else:
+                if sys.argv[i+1] == 'blue':
+                    t1, t2, t3, t4, t5, t6 = 30, 144, 255, 25, 25, 112
+                elif sys.argv[i+1] == 'red':
+                    t1, t2, t3, t4, t5, t6 = 200, 100, 0, 255, 0, 0
+            minblastc = (t1, t2, t3)
+            maxblastc = (t4, t5, t6)
+        elif sys.argv[i] == '-blast_col_inv':
+            if sys.argv[i+ 1].isdigit():
+                lastflag = i+7
+                t1 = int(sys.argv[i+1])
+                t2 = int(sys.argv[i+2])
+                t3 = int(sys.argv[i+3])
+                t4 = int(sys.argv[i+4])
+                t5 = int(sys.argv[i+5])
+                t6 = int(sys.argv[i+6])
+            else:
+                if sys.argv[i+1] == 'blue':
+                    t1, t2, t3, t4, t5, t6 = 30, 144, 255, 25, 25, 112
+                elif sys.argv[i+1] == 'red':
+                    t1, t2, t3, t4, t5, t6 = 200, 100, 0, 255, 0, 0
+            minblastci = (t1, t2, t3)
+            maxblastci = (t4, t5, t6)
+        elif sys.argv[i] == '-f':
+            r, g, b = 64, 224, 208
+            arrow = 'arrow'
+            feat = sys.argv[i+1]
+            if feat == 'F':
+                nofeat = True
+            if len(sys.argv) > i + 2 and sys.argv[i+2].isdigit():
+                r = int(sys.argv[i+2])
+                g = int(sys.argv[i+3])
+                b = int(sys.argv[i+4])
+                if len(sys.argv) > i + 5 and (sys.argv[i+5] == 'arrow' or sys.argv[i+5] == 'rect' \
+                or sys.argv[i+5] =='frame' or sys.argv[i+5] == 'pointer'):
+                    arrow = sys.argv[i+5]
+                    lastflag = i + 6
+                else:
+                    lastflag = i + 5
+            if len(sys.argv) > i + 2 and (sys.argv[i+2] == 'arrow' or sys.argv[i+2] == 'rect' \
+            or sys.argv[i+2] =='frame' or sys.argv[i+2] == 'pointer'):
+                arrow = sys.argv[i+2]
+                lastflag = i + 3
+            featDict[feat] = (arrow, (r, g, b))
+        elif sys.argv[i] == '-glt':
+            glt = int(sys.argv[i+1])
+        elif sys.argv[i] == '-exont':
+            exont = int(sys.argv[i+1])
+        elif sys.argv[i] == genet:
+            genet = int(sys.argv[i+1])
+        elif sys.argv[i] == '-aln':
+            aln = sys.argv[i+1]
+            if aln == 'best':
+                aln = 'best blast'
+        elif sys.argv[i] == '-bo':
+            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
+                blastoutline = True
+            else:
+                blastoutline = False
+        elif sys.argv[i] == '-G':
+            if sys.argv[i+1] == 'GCContent':
+                getgc = True
+            elif sys.argv[i+1] == 'GCSkew':
+                getgcskew = True
+            elif sys.argv[i+1] == 'Coverage':
+                getcoverage = True
+                gfilename = sys.arv[i+2]
+                lastflag += 1
+            elif sys.argv[i+1] == 'Custom':
+                getcustom = True
+                gfilename = sys.argv[i+2]
+                lastflag += 1
+            else:
+                print sys.argv[i+1] + ' not a valid graph type'
+        elif sys.argv[i] == '-wind_size':
+            windsize = int(sys.argv[i+1])
+        elif sys.argv[i] == '-step':
+            step = int(sys.argv[i+1])
+        elif sys.argv[i] == '-line':
+            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
+                gtype = 'Line'
+        elif sys.argv[i] == '-axis_t':
+            axisthick = sys.argv[i+1]
+        elif sys.argv[i] == '-pos_col':
+            lastflag = i + 4
+            r = int(sys.argv[i+1])
+            g = int(sys.argv[i+2])
+            b = int(sys.argv[i+3])
+            pvc = (r, g, b)
+        elif sys.argv[i] == '-neg_col':
+            lastflag = i + 4
+            r = int(sys.argv[i+1])
+            g = int(sys.argv[i+2])
+            b = int(sys.argv[i+3])
+            nvc = (r, g, b)
+        elif sys.argv[i] == '-g_height':
+            gheight = int(sys.argv[i+1])
+        elif sys.argv[i] == '-gap':
+            ggap = int(sys.argv[i+1])
+        elif sys.argv[i] == '-y_max':
+            gmaxy = int(sys.argv[i+1])
+        elif sys.argv[i] == '-A':
+            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
+                auto = True
+            else:
+                auto = False
+        elif sys.argv[i] == '-svg':
+            svg = True
+            lastflag -= 1
+        elif sys.argv[i] == '-filter':
+            filter = True
+            lastflag -= 1
+        elif sys.argv[i] == '-legend':
+            if sys.argv[i+1] == 'single':
+                legend = 'Single column'
+            elif sys.argv[i+1] == 'double':
+                legend = 'Two columns'
+            elif sys.argv[i+1] == 'top':
+                legend = 'Top'
+            elif sys.argv[i+1] == 'bottom':
+                legend = 'Bottom'
+            elif sys.argv[i+1] == 'both':
+                legend = 'Top & Bottom'
+            else:
+                print 'Legend options are <single/double/top/bottom/both/None> (case sensitive), using None.'
+        elif sys.argv[i] == '-leg_name':
+            legname = sys.argv[i+1]
+
+    inlist = sys.argv[lastflag+1:]
+    templist = []
+    revlist = []
+    cutlist = []
+    last = sys.argv[lastflag]
+    rev = False
+    cuts = [None, None]
+    for i in inlist:
+        if i == 'R':
+            rev = True
+            getit = True
+        elif i.isdigit():
+            if cuts[0] == None:
+                cuts[0] = int(i)
+            else:
+                cuts[1] = int(i)
+        elif i == 'Max':
+            cuts[1] = i
+        else:
+            revlist.append(rev)
+            if cuts == [None, None]:
+                cuts = [1, 'Max']
+            cutlist.append(tuple(cuts))
+            templist.append(last)
+            rev = False
+            cuts = [None, None]
+            last = i
+    revlist.append(rev)
+    if cuts == [None, None]:
+        cuts = [1, 'Max']
+    cutlist.append(tuple(cuts))
+    templist.append(last)
+    if getgc:
+        thearray = []
+        for j in range(len(templist)):
+            mincut, maxcut = cutlist[j]
+            thearray.append(getGCcontent(templist[j], windsize, step, mincut, maxcut))
+        graphit = [thearray, pvc, nvc, gheight, axisthick, gtype, gmaxy, ggap]
+    elif getgcskew:
+        thearray = []
+        for j in range(len(templist)):
+            mincut, maxcut = cutlist[j]
+            thearray.append(getGCskew(templist[j], windsize, step, mincut, maxcut))
+        graphit = [thearray, pvc, nvc, gheight, axisthick, gtype, gmaxy, ggap]
+    elif getcustom:
+        thearray = getcustom(gfilename)
+        graphit = [thearray, pvc, nvc, gheight, axisthick, gtype, gmaxy, ggap]
+    elif getcoverage:
+        thearray = [getCoverage(templist[0], gfilename, cutlist[0][0], cutlist[0][1])]
+        graphit = [thearray, pvc, nvc, gheight, axisthick, gtype, gmaxy, ggap]
+    if blastit:
+        inlist = genBlast(templist, cutlist)
+    elif tblastit:
+        inlist = genTBlastX(templist, cutlist)
+    elif blastfiles != None:
+        tempfiles = sys.argv[blastfiles+1:]
+        inlist = []
+        for i in templist:
+            inlist.append(templist)
+            inlist.append(tempfiles.pop(0))
+    else:
+        'Please choolse -blastn or -tblastx flags to generate blast files, or use -blast_files to use previously generated files.'
+    if filename == None:
+        print 'Please choose a file to write to (-o tag) and try agian.'
+        sys.exit()
+    if featDict == {} and not nofeat:
+        featDict = {'CDS': ('arrow', (64, 224, 208))}
+    if svg :
+        x = drawsvg(filename, minlength, mineval, minIdent, inlist, width, height1, height2,
+         minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
+         compress, revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
+         blastoutline, cutlist, filter, legend, legname)
+    else:
+        x = draw(filename, minlength, mineval, minIdent, inlist, width, height1, height2,
+         minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
+         compress, revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
+         blastoutline, cutlist, filter, legend, legname)
+    if blastit or tblastit:
+        shutil.rmtree('temp_easyfig')
+    print "Minimum blast hit reported: " + str(x) + '%'
+
+elif len(sys.argv) == 1:
+    from Tkinter import *
+    class DDlistbox(Listbox):
+        def __init__(self, master, **kw):
+            kw['selectmode'] = SINGLE
+            Listbox.__init__(self, master, kw)
+            self.bind('<Button-1>', self.setCurrent)
+            self.bind('<B1-Motion>', self.shiftSelection)
+            self.curIndex = None
+        def setCurrent(self, event):
+            self.curIndex = self.nearest(event.y)
+        def shiftSelection(self, event):
+            i = self.nearest(event.y)
+            if i < self.curIndex:
+                x = self.get(i)
+                self.delete(i)
+                self.insert(i+1, x)
+                self.curIndex = i
+            elif i > self.curIndex:
+                x = self.get(i)
+                self.delete(i)
+                self.insert(i-1, x)
+                self.curIndex = i
+    abortCaptain = False
+    root = Tk()
+    root.title('Easyfig.py')
+    root.option_add('*Font', 'TkDefaultFont 12')
+    app = App(root)
+    root.mainloop()
+else:
+    print '''
+Easyfig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
+Supervisor: Dr. Scott Beatson   University of Queensland    03.12.2010
+
+License: GPLv3
+
+Version 2.2.2
+
+Usage: Easyfig.py [options] GenBank/EMBL/fasta GenBank/EMBL/fasta GenBank/EMBL/fasta ...
+
+This script should work on 1 to an infinite amount of GenBank/EMBL files (given enough memory)
+
+Adding 2 integers after the annotation file will crop the annotation file.
+Adding a R after the annotation file will reverse compliment it.
+
+WARNING: Will overwrite output file without warning.
+
+***************************************************************
+GenBank or EMBL file must have source line, or Sequence.
+'     source  1..<sequence length>' or 'FT   source    1..<sequence length>'
+
+for GenBank / EMBL
+
+***************************************************************
+
+The GenBank file preceding the blast file should always be the query
+the GenBank file after the blast file should always be the reference
+In it's present state only 'CDS' features will be recorded
+
+Options:
+-o <string>   Specify output file. <REQUIRED!>
+-blastn       Generate blastn files automatically. Requires blastall or blast+
+              in the path, Annotation file must have nucleotide sequence. [Default]
+-tblastx      Generate tblastx files automatically. Requires blastall or blast+
+              in the path, Annotation file must have nucleotide sequence.
+-blast_files  List of previously generated blast files, ordered. Query must be
+              annotation file on top, reference annotation file on bottom.
+-svg          Create Scalable Vector Graphics (svg) file instead of bmp.
+-filter       Filter small blast hits or annotations (< 4 pixels wide). [F]
+
+
+GENERAL OPTIONS:
+-width <int>          width of figure in pixels. [5000]
+-ann_height <int>     height of annotations in figure (pixels). [50]
+-blast_height <int>   height of blast hits in figure (pixels). [100]
+-f1 <T/F>             draw colour gradient figure for blast hits. [F]
+-f2 <int>             draw scale figure <int> base pairs long. [0]
+-uncomp <T/F>         Do not compress figure. [F]
+-f  <string> [r g b] [arrow/rect/pointer/frame]
+                      Draw features of type <string> (case sensitive) in the
+                      color r g b with illustration type arrow, rectangle,
+                      pointer or frame. Default light blue arrows.
+                      EXAMPLE: -f CDS 255 0 0 rect will draw all CDS features as
+                      a red rectangle.
+                      if none specified easyFig automatically draws CDS features.
+                      If you want a figure with no features drawn use -f F
+-glt <int>            Genome line is <int> pixels thick [5]
+-exont <int>          exon lines joining introns are <int> pixels thick. [1]
+-genet <int>          outline of features is <int> pixels thick. [1]
+-aln <best/left/right/centre> [centre]
+                      Alignment of genomes
+                      best aligns feature file perpendicular to best blast hit.
+-legend <single/double/top/bottom/both/None>
+                      Single: Gene names in single column
+                      Double: Gene names in two columns
+                      Top: Top feature file genes labelled above figure
+                      Bottom: Bottom feature file genes labelled below figure
+                      Both: Top and bottom feature files genes labelled above
+                            and below genome.
+                      None: No legend or gene labelling <default>
+-leg_name             Where to get feature name from [gene]
+
+BLAST OPTIONS:
+-e <float>            maxmimum e value of blast hits to be drawn. [0.001]
+-i <float>            minimum identity value of blast hits to be drawn. [0]
+-min_length <int>     minimum length of blast hits to be drawn. [0]
+-blast_col <red/blue> changes blast hits to gradient of red or blue
+                      alternitively <int1 int2 int3 int4 int5 int6>
+                      defines color gradient for blast hits
+                      worst blast hit reported will be color int1 int2 int3
+                      where int 1 2 3 is the RGB of color range[0-255]
+                      100% identity blast hits will be color int4 int5 int6
+                      [default 20 20 20 175 175 175] <gray>
+
+-blast_col_inv        Colour for inverted blast hits.
+-bo <T/F>             Black outline of blast hits. [T]
+
+GRAPH OPTIONS:
+-G <GCContent/GCSkew/Coverage/Custom [filename]>
+                      Plot GC Content, GC Skew, Coverage or Custom graph.
+                      if Coverage or Custom filename for ace or custom file needs
+                      to be provided. Details on how to make custom graph files
+                      in manual.
+-wind_size <int>      Window size for calculating GC content/GC skew. [1000]
+-step <int>           Step size for calculating GC content/GC skew. [1000]
+-line <T/F>           Draw graph as a line graph. [T]
+-axis_t               Thickness of X axis. [1]
+-pos_col <int int int> RGB colour of positive values in graph. [Red]
+-neg_col <int int int> RGB colour of negative values in graph. [Blue]
+-g_height <int>       height of graph in pixels. [50]
+-gap                  gap between graph and annotations. [10]
+-y_max                Maximum y value [Default: max Y calculated.]
+
+
+EXAMPLES:
+
+Easyfig_CL_1.2.py -filter -o outfile.bmp genbank1.gbk genbank2.gbk genbank3.gbk
+
+Easiest way to generate a simple comparison file between three (or more) annotation
+files. Shows CDS features as red arrows.
+
+Easyfig_CL_1.2.py -o outfile.bmp -e 0.00001 -f gene frame 0 0 255 -G GCContent ann1.embl ann2.gbk ann3.gbk ann4.embl
+
+Generate a blastn comparison between 4 annotation files, Display genes as blue
+arrows in frame. Only report blast hits under 0.00001 expect value.
+Display the GC content of each file as a graph.
+
+Easyfig_CL_1.2.py -tblastx -o outfile.svg -svg ann1.embl 1 10000 ann2.embl 1 10000 R
+
+Show a tblastx comparison of the first 10000 base pairs of ann1.embl and ann2.embl
+Reverse compliment ann2.embl. Writes as a SVG file.
+
+
+this script uses a modified version of Paul McGuire's (http://www.geocities.com/ptmcg/ RIP (geocities, not paul))
+bmp.py - module for constructing simple BMP graphics files
+'''
+
+
