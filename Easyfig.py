@@ -5508,7 +5508,7 @@ ffffffffffffffffffff'
             for i in range(8): # 128 colour table
                 for j in range(4):
                     for k in range(4):
-                        binarystring += chr(int(i*35.42)) + chr(j*85) + chr(k*85)
+                        binarystring += chr(int(i*36.5)) + chr(j*85) + chr(k*85)
         binarystring += ',\x00\x00\x00\x00' + struct.pack('h', self.wd) + struct.pack('h', self.ht) + '\x00' # image descriptor
         binarystring += '\x07' # LZW Minimum code size
         pixstring = ''
@@ -5524,8 +5524,7 @@ ffffffffffffffffffff'
                 else:
                     colourhash = self.palette[j]
                     colour = Color.fromLong(colourhash)
-                    colbin = "{0:b}".format(colour.red / 8).zfill(3) + "{0:b}".format(colour.grn / 4).zfill(2) + "{0:b}".format(colour.blu / 4).zfill(2)
-                    print colbin
+                    colbin = "{0:b}".format(colour.red / 32).zfill(3) + "{0:b}".format(colour.grn / 64).zfill(2) + "{0:b}".format(colour.blu / 64).zfill(2)
                     if oneistone:
                         pixstring += chr(int(colbin, 2))
                     else:
