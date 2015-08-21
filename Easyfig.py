@@ -5524,7 +5524,8 @@ ffffffffffffffffffff'
                 else:
                     colourhash = self.palette[j]
                     colour = Color.fromLong(colourhash)
-                    colbin = '0' + "{0:b}".format(colour.red).zfill(3) + "{0:b}".format(colour.grn).zfill(2) + "{0:b}".format(colour.blu).zfill(2)
+                    colbin = "{0:b}".format(colour.red / 8).zfill(3) + "{0:b}".format(colour.grn / 4).zfill(2) + "{0:b}".format(colour.blu / 4).zfill(2)
+                    print colbin
                     if oneistone:
                         pixstring += chr(int(colbin, 2))
                     else:
