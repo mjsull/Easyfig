@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
 # Version 2.2.2 10.08.2015
