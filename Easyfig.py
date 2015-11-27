@@ -10699,6 +10699,379 @@ clicking ok will bring up\nthe download location\nin your browser.')
         else:
             self.processLab.config(text='Unable to download blast.\nPlease dowload manually.')
             
+def gbk2fasta(genbank, out, mincut, maxcut):
+    getseq = False
+    getembl = False
+    getmultifa = False
+    seq = ''
+    try:
+        mincut = int(mincut)
+        if mincut < 1: mincut = 1
+        if maxcut != 'Max':
+            maxcut = int(maxcut)
+        if maxcut < 1: maxcut = 1
+    except:
+        print 'Annotation slice values not valid.'
+    try:
+        gen = open(genbank)
+        outfile = open(out, 'w')
+        for line in gen:
+            if line.startswith('ORIGIN'):
+                getseq = True
+            elif line.startswith('SQ   Sequence'):
+                getembl = True
+            elif line.startswith('>'):
+                if getmultifa:
+                    seq += 'qqq'
+                else:
+                    getmultifa = True
+            elif line.startswith('//'):
+                getseq = False
+                getembl = False
+            elif getseq:
+                seq += ''.join(line.split()[1:])
+            elif getembl:
+                seq += ''.join(line.split()[:-1])
+            elif getmultifa:
+                seq += line.rstrip()
+        if getmultifa:
+            getset = set(seq)
+            rightchars = set('atgcATGCqnNuUyYkKmMsSwWbBdDhHvVxXrR-')
+            isitgood = True
+            for i in getset:
+                if not i in rightchars:
+                    isitgood = False
+            if not isitgood:
+                print 'Annotation file contains invalid characters. Check genbank/EMBL contains no lines starting with > or that fasta file contains only valid nucleotides'
+                return 0
+        if '/' in out:
+            outfile.write('>' + out.split('/')[1] + '\n')
+        else:
+            outfile.write('>' + out + '\n')
+        if maxcut == 'Max':
+            maxcut = len(seq)
+        if mincut == 1 and maxcut == len(seq):
+            if getmultifa:
+                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+            outfile.write(seq)
+        elif mincut < maxcut:
+            seq = seq[mincut-1:maxcut]
+            if getmultifa:
+                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+            outfile.write(seq)
+        else:
+            seq = seq[mincut-1:] + seq[:maxcut]
+            if getmultifa:
+                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+            outfile.write(seq)
+        if len(seq) == 0:
+            print 'There is no sequence in ' + genbank + '.'
+            return 0
+        else:
+            return 1
+    except:
+        print genbank + ' does not exist.'
+        return 0
+
+def getGCcontent(filename, windsize, step, mincut, maxcut):
+    try:
+        gen = open(filename)
+        getseq = False
+        getembl = False
+        seq = ''
+        for line in gen:
+            if line.startswith('ORIGIN'):
+                getseq = True
+            elif line.startswith('SQ   Sequence'):
+                getembl = True
+            elif line.startswith('//'):
+                getseq = False
+                getembl = False
+            elif getseq:
+                seq += ''.join(line.split()[1:])
+            elif getembl:
+                seq += ''.join(line.split()[:-1])
+        gen.close()
+        seq = seq.upper()
+    except:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    if len(seq) == 0:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    if maxcut == 'Max':
+        seq = seq[int(mincut)-1:]
+    elif int(maxcut) <= int(mincut):
+        seq = seq[int(mincut)-1:] + seq[:int(maxcut)+1]
+    else:
+        seq = seq[int(mincut)-1:int(maxcut)+1]
+    window1 = int(windsize) / 2
+    window2 = int(windsize) - window1
+    thearray = []
+    for i in range(0, len(seq), int(step)):
+        seqstring = seq[max([0, i-window1]):i+window2]
+        thearray.append((seqstring.count('G') + seqstring.count('C')) * 1.0 / len(seqstring) - 0.5)
+    return thearray
+
+def getGCskew(filename, windsize, step, mincut, maxcut):
+    try:
+        getseq = False
+        getembl = False
+        seq = ''
+        gen = open(filename)
+        for line in gen:
+            if line.startswith('ORIGIN'):
+                getseq = True
+            elif line.startswith('SQ   Sequence'):
+                getembl = True
+            elif line.startswith('//'):
+                getseq = False
+                getembl = False
+            elif getseq:
+                seq += ''.join(line.split()[1:])
+            elif getembl:
+                seq += ''.join(line.split()[:-1])
+        gen.close()
+        seq = seq.upper()
+    except:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    if len(seq) == 0:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    if maxcut == 'Max':
+        seq = seq[int(mincut)-1:]
+    elif int(maxcut) <= int(mincut):
+        seq = seq[int(mincut)-1:] + seq[:int(maxcut)+1]
+    else:
+        seq = seq[int(mincut)-1:int(maxcut)+1]
+    window1 = int(windsize) / 2
+    window2 = int(windsize) - window1
+    thearray = []
+    for i in range(0, len(seq), int(step)):
+        seqstring = seq[max([0, i-window1]):i+window2]
+        gcount = seqstring.count('G')
+        ccount = seqstring.count('C')
+        try:
+            thearray.append((gcount - ccount) * 1.0 / (gcount + ccount))
+        except:
+            thearray.append(0)
+    return thearray
+
+def getCoverage(filename, filename2, mincut, maxcut):
+# DEFNIITION: takes a file and reads in all contigs, their start positions and the reads located within the contig
+# REQUIRES: a valid ace file
+# RETURNS: A list of objects of class contig
+    seq = ''
+    getseq = False
+    getembl = False
+    try:
+        gen = open(filename)
+        for line in gen:
+            if line.startswith('ORIGIN'):
+                getseq = True
+            elif line.startswith('SQ   Sequence'):
+                getembl = True
+            elif line.startswith('//'):
+                getseq = False
+                getembl = False
+            elif getseq:
+                seq += ''.join(line.split()[1:])
+            elif getembl:
+                seq += ''.join(line.split()[:-1])
+        gen.close()
+    except:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    if len(seq) == 0:
+        print 'Annotation file ' + filename + ' not valid.'
+        return None
+    seq = seq.lower()
+    if maxcut == 'Max':
+        seq = seq[int(mincut)-1:]
+    elif int(maxcut) <= int(mincut):
+        seq = seq[int(mincut)-1:] + seq[:int(maxcut)+1]
+    else:
+        seq = seq[int(mincut)-1:int(maxcut)+1]
+    outlist = [0 for i in range(len(seq))]
+    readlist = [] # list of reads to be added to the contig class
+    index = 0 # switches to 1 once program has dealt with the initial contig
+    # iterates through the file determines what information is contained in each line then reads it to the
+    # right locationregular expressions python
+    transtab = string.maketrans('atgc', 'tacg')
+    acefile = open(filename2)
+    for line in acefile:
+        # puts name in file and starts reading sequence below
+        if line.startswith("CO "):
+            if index != 0:
+                freqDict = {}
+                for j in readlist:
+                    for k in range(j.startpos, (j.startpos + j.readLength)):
+                        if k in freqDict:
+                            freqDict[k] += 1
+                        else:
+                            freqDict[k] = 1
+                coverageList = []
+                for j in range(1, len(contigSeq) + 1):
+                    if contigSeq[j - 1] != '*':
+                        coverageList.append(freqDict[j])
+                contigSeq = contigSeq.lower()
+                thepos = seq.find(contigSeq)
+                if thepos != -1:
+                    outlist = outlist[:thepos] + coverageList + outlist[thepos + len(coverageList):]
+                else:
+                    contigSeq = contigSeq[::-1]
+                    contigSeq = contigSeq.translate(transtab)
+                    thepos = seq.find(contigSeq)
+                    if thepos != -1:
+                        coverageList.reverse()
+                        outlist = outlist[:thepos] + coverageList + outlist[thepos + len(coverageList):]
+                readlist = []
+            index = 1
+            contigSeq = ''
+            contigName = line.split()[1] # splits the line into a list with elements seperated by whitespace characters
+                                      # then returns the second element of that list (the name)
+            readnumber = 0 # initiates the read number used to determine where the readsequence will be added
+      # creates a object of class read with the name and location within the contig, leaves sequence as the
+      # empty string to be read in later
+        elif line.startswith('BQ'):
+            index = 2
+        elif line.startswith("AF "):
+            readIt = line.split() # splits the line into a list of strings seperated by whitespace characters
+            readName = readIt[1] # the name of the read
+            readPos = int(readIt[3]) # the position of the read within the contig
+            readInstance = read(readName, readPos, None) # creates an instance of class read
+            readlist.append(readInstance) # appends to list
+        elif index == 1:
+            contigSeq += line[:-1]
+        elif line.startswith("QA "):
+            readlist[readnumber].startpos = readlist[readnumber].startpos + int(line.split()[1]) - 1
+            readlist[readnumber].readLength = int(line.split()[2]) - int(line.split()[1]) + 1
+            readnumber += 1
+    freqDict = {}
+    for j in readlist:
+        for k in range(j.startpos, (j.startpos + j.readLength)):
+            if k in freqDict:
+                freqDict[k] += 1
+            else:
+                freqDict[k] = 1
+    coverageList = []
+    for j in range(1, len(contigSeq) + 1):
+        if contigSeq[j - 1] != '*':
+            coverageList.append(freqDict[j])
+    contigSeq = contigSeq.lower()
+    thepos = seq.find(contigSeq)
+    if thepos != -1:
+        outlist = outlist[:thepos] + coverageList + outlist[thepos + len(coverageList):]
+    else:
+        contigSeq = contigSeq[::-1]
+        contigSeq = contigSeq.translate(transtab)
+        thepos = seq.find(contigSeq)
+        if thepos != -1:
+            coverageList.reverse()
+            outlist = outlist[:thepos] + coverageList + outlist[thepos + len(coverageList):]
+    return outlist
+
+def getCustom(filename):
+    try:
+        thearray = []
+        gen = open(filename)
+        templine = gen.readline().rstrip().split('\t')
+        linelen = len(templine)
+        for i in templine:
+            thearray.append([float(i)])
+        for line in gen:
+            templine = line.rstrip().split('\t')
+            for i in range(len(templine)):
+                if templine[i] != '':
+                    thearray[i].append(float(templine[i]))
+        return thearray
+    except:
+        print filename + ' not valid graph file.'
+        return None
+
+
+
+def genBlast(inlist, cutlist):
+    try:
+        os.mkdir('temp_easyfig')
+    except:
+        pass
+    num = 1
+    outlist = []
+    for i in inlist:
+        gbk2fasta(i, 'temp_easyfig/' + str(num) + '.easyfig.fa', cutlist[num-1][0], cutlist[num-1][1])
+        num += 1
+    for i in range(len(inlist) - 1):
+        if isNewBlastDB():
+            subprocess.Popen('makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) +
+                             '.easyfig.fa', shell=True).wait()
+            print 'makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) + '.easyfig.fa'
+        elif isLegBlastDB():
+            subprocess.Popen('formatdb -p F -t tempdb -n temp_easyfig/tempdb -i temp_easyfig/'
+                             + str(i + 2) + '.easyfig.fa', shell=True).wait()
+        else:
+            print 'Could not find BLAST.'
+            sys.exit()
+        if isNewBlastn():
+            subprocess.Popen('blastn -task blastn -db temp_easyfig/tempdb -outfmt 6 -query temp_easyfig/' + str(i+1)
+                             + '.easyfig.fa -out temp_easyfig/' + str(i + 1) + str(i+2) + '.easyfig.out',
+                             shell=True).wait()
+        elif isLegBlastall():
+            subprocess.Popen('blastall -p blastn -d temp_easyfig/tempdb -F F -m 8 -a 8 -i temp_easyfig/'
+                         + str(i + 1) + '.easyfig.fa -o temp_easyfig/'
+                         + str(i+1) + str(i+2) + '.easyfig.out', shell=True).wait()
+        else:
+            print 'Could not find BLAST.'
+            sys.exit()
+        outlist.append(inlist[i])
+        outlist.append('temp_easyfig/' + str(i+1) + str(i+2) + '.easyfig.out')
+    outlist.append(inlist[-1])
+    return outlist
+
+def genTBlastX(inlist, cutlist):
+    pwd = os.getcwd()
+    if os.path.exists('temp_easyfig'):
+        print 'please run from a directory without the folder temp_easyfig'
+        sys.exit()
+    os.mkdir('temp_easyfig')
+    os.chdir('temp_easyfig')
+    num = 1
+    outlist = []
+    for i in inlist:
+        if i[0] in ['/', '\\', '~']:
+            thepath = i
+        else:
+            thepath = '../' + i
+        gbk2fasta(thepath, str(num) + '.easyfig.fa', cutlist[num-1][0], cutlist[num-1][1])
+        num += 1
+    for i in range(len(inlist) - 1):
+        if isNewBlastDB():
+            subprocess.Popen('makeblastdb -dbtype nucl -out tempdb -in ' + str(i + 2) +
+                             '.easyfig.fa', shell=True).wait()
+        elif isLegBlastDB():
+            subprocess.Popen('formatdb -p F -t tempdb -n tempdb -i '
+                             + str(i + 2) + '.easyfig.fa', shell=True).wait()
+        else:
+            print 'Could not find BLAST.'
+            sys.exit()
+        if isNewTblastx():
+            subprocess.Popen('tblastx -db tempdb -outfmt 6 -query ' + str(i+1)
+                             + '.easyfig.fa -out ' + str(i + 1) + str(i+2) + '.easyfig.out',
+                             shell=True).wait()
+        elif isLegBlastall():
+            subprocess.Popen('blastall -p tblastx -d tempdb -F F -m 8 -a 8 -i '
+                         + str(i + 1) + '.easyfig.fa -o '
+                         + str(i+1) + str(i+2) + '.easyfig.out', shell=True).wait()
+        else:
+            print 'Could not find BLAST.'
+            sys.exit()
+        outlist.append(inlist[i])
+        outlist.append(os.getcwd() + '/' + str(i+1) + str(i+2) + '.easyfig.out')
+    os.chdir(pwd)
+    outlist.append(inlist[-1])
+    return outlist
+
 
 global abortCaptain
 
