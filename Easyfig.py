@@ -11364,9 +11364,10 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
     elif blastfiles != None:
         tempfiles = sys.argv[blastfiles+1:]
         inlist = []
-        for i in templist:
-            inlist.append(templist)
+        for i in templist[:-1]:
+            inlist.append(i)
             inlist.append(tempfiles.pop(0))
+        inlist.append(templist[-1])
     else:
         'Please choolse -blastn or -tblastx flags to generate blast files, or use -blast_files to use previously generated files.'
     if filename == None:
