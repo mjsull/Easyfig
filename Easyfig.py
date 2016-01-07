@@ -7048,7 +7048,9 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                 if j[1] - j[0] > maxbitscore:
                     qstart, qend, rstart, rend = j[0], j[1], j[2], j[3]
                     maxbitscore = j[1] - j[0]
-            if reverseList[i/2]:
+            if len(secondlist[i]) == 0:
+                theQstart = 0
+            elif reverseList[i/2]:
                 theQstart = secondlist[i-1][0] - qend
             else:
                 theQstart = qstart
@@ -7058,7 +7060,9 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                 else:
                     theRstart = secondlist[i+1][0] - rstart
             else:
-                if rstart < rend:
+                if len(secondlist[i]) == 0:
+                    theRstart = 0
+                elif rstart < rend:
                     theRstart = rstart
                 else:
                     theRstart = rend
@@ -11362,6 +11366,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
     elif tblastit:
         inlist = genTBlastX(templist, cutlist)
     elif blastfiles != None:
+
         tempfiles = sys.argv[blastfiles+1:]
         inlist = []
         for i in templist[:-1]:
