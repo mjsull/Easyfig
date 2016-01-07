@@ -6162,17 +6162,23 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                 if j[1] - j[0] > maxbitscore:
                     qstart, qend, rstart, rend = j[0], j[1], j[2], j[3]
                     maxbitscore = j[1] - j[0]
-            if reverseList[i/2]:
+            if len(secondlist[i]) == 0:
+                theQstart = 0
+            elif reverseList[i/2]:
                 theQstart = secondlist[i-1][0] - qend
             else:
                 theQstart = qstart
             if reverseList[(i+1)/2]:
-                if rstart < rend:
+                if len(secondlist[i]) == 0:
+                    theRstart = 0
+                elif rstart < rend:
                     theRstart = secondlist[i+1][0] - rend
                 else:
                     theRstart = secondlist[i+1][0] - rstart
             else:
-                if rstart < rend:
+                if len(secondlist[i]) == 0:
+                    theRstart = 0
+                elif rstart < rend:
                     theRstart = rstart
                 else:
                     theRstart = rend
@@ -7055,7 +7061,9 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
             else:
                 theQstart = qstart
             if reverseList[(i+1)/2]:
-                if rstart < rend:
+                if len(secondlist[i]) == 0:
+                    theRstart = 0
+                elif rstart < rend:
                     theRstart = secondlist[i+1][0] - rend
                 else:
                     theRstart = secondlist[i+1][0] - rstart
@@ -11310,15 +11318,30 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
                 print 'Legend options are <single/double/top/bottom/both/None> (case sensitive), using None.'
         elif sys.argv[i] == '-leg_name':
             legname = sys.argv[i+1]
-
     inlist = sys.argv[lastflag+1:]
+    if blastfiles != None and lastflag == blastfiles + 2:
+        allthestuff = sys.argv[blastfiles+1:]
+        allthestuff2 = []
+        for i in allthestuff:
+            if i != 'R' and i != 'Max' and not i.isdigit():
+                allthestuff2.append(i)
+        inlist = allthestuff[len(allthestuff2)/2:]
+        last = inlist[0]
+        inlist = inlist[1:]
+    else:
+        last = sys.argv[lastflag]
     templist = []
     revlist = []
     cutlist = []
-    last = sys.argv[lastflag]
     rev = False
     cuts = [None, None]
     for i in inlist:
+        if i == 'R' or i == 'Max' or i.isdigit():
+            if os.path.exists(i):
+                sys.stderr.write('Cannot tell if "' + i +
+                                 '" is an file or argument (the file exists and this is also the argument to trim or reverse genome).\
+            \nPlease rename file (if file) or remove file from directory (if argument).\n')
+                sys.exit()
         if i == 'R':
             rev = True
             getit = True
@@ -11342,6 +11365,10 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
     if cuts == [None, None]:
         cuts = [1, 'Max']
     cutlist.append(tuple(cuts))
+    for i in cutlist:
+        if None in i:
+            sys.stderr.write('Please provide a start coordinate and end coordinate for genome cuts. (Only a single coordinate was provided)\n')
+            sys.exit()
     templist.append(last)
     if getgc:
         thearray = []
@@ -11366,9 +11393,8 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
     elif tblastit:
         inlist = genTBlastX(templist, cutlist)
     elif blastfiles != None:
-
-        tempfiles = sys.argv[blastfiles+1:]
         inlist = []
+        tempfiles = sys.argv[blastfiles+1:]
         for i in templist[:-1]:
             inlist.append(i)
             inlist.append(tempfiles.pop(0))
