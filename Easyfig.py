@@ -7042,8 +7042,8 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                 for j in secondlist[i]:
                     if (j[1] - j[0]) * 1.0 / maxlength * width > 3:
                         temp.append(j)
-                    if j[4] < minident:
-                        minident = j[4]
+                        if j[4] < minident:
+                            minident = j[4]
                 tempsecond.append(temp)
         secondlist = tempsecond
     if aln == 'best blast':
