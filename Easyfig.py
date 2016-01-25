@@ -7018,6 +7018,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
             totalheight += height1
         else:
             totalheight += height2
+            print minlength, mineval, minIdent
             temp = getBlast(inputlist[i], minlength, mineval, minIdent)
             for j in temp:
                 if j[4] < minident:
@@ -11136,6 +11137,7 @@ lastflag = 1
 filename = None
 svg = False
 filter = False
+keep_blast = False
 nofeat = False
 gmaxy = 'Auto'
 legend = 'None'
@@ -11153,7 +11155,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
         elif sys.argv[i] == '-min_length':
             minlength = int(sys.argv[i+1])
         elif sys.argv[i] == '-i':
-            minIdent == float(sys.argv[i+1])
+            minIdent = float(sys.argv[i+1])
         elif sys.argv[i] == '-width':
             width = int(sys.argv[i+1])
         elif sys.argv[i] == '-ann_height':
@@ -11300,6 +11302,9 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
         elif sys.argv[i] == '-svg':
             svg = True
             lastflag -= 1
+        elif sys.argv[i] == '-keep':
+            keep_blast = True
+            lastflag -= 1
         elif sys.argv[i] == '-filter':
             filter = True
             lastflag -= 1
@@ -11416,7 +11421,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
          compress, revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
          blastoutline, cutlist, filter, legend, legname)
-    if blastit or tblastit:
+    if (blastit or tblastit) and not keep_blast:
         shutil.rmtree('temp_easyfig')
     print "Minimum blast hit reported: " + str(x) + '%'
 
@@ -11466,6 +11471,7 @@ Adding 2 integers after the annotation file will crop the annotation file.
 Adding a R after the annotation file will reverse compliment it.
 
 WARNING: Will overwrite output file without warning.
+WARNING: Will delete temp_easyfig folder if -keep flag not given.
 
 ***************************************************************
 GenBank or EMBL file must have source line, or Sequence.
@@ -11536,6 +11542,7 @@ BLAST OPTIONS:
 
 -blast_col_inv        Colour for inverted blast hits.
 -bo <T/F>             Black outline of blast hits. [T]
+-keep                 Don't delete blast output (temp_easyfig/)
 
 GRAPH OPTIONS:
 -G <GCContent/GCSkew/Coverage/Custom [filename]>
@@ -11556,18 +11563,18 @@ GRAPH OPTIONS:
 
 EXAMPLES:
 
-Easyfig_CL_1.2.py -filter -o outfile.bmp genbank1.gbk genbank2.gbk genbank3.gbk
+Easyfig.py -filter -o outfile.bmp genbank1.gbk genbank2.gbk genbank3.gbk
 
 Easiest way to generate a simple comparison file between three (or more) annotation
 files. Shows CDS features as red arrows.
 
-Easyfig_CL_1.2.py -o outfile.bmp -e 0.00001 -f gene frame 0 0 255 -G GCContent ann1.embl ann2.gbk ann3.gbk ann4.embl
+Easyfig.py -o outfile.bmp -e 0.00001 -f gene frame 0 0 255 -G GCContent ann1.embl ann2.gbk ann3.gbk ann4.embl
 
 Generate a blastn comparison between 4 annotation files, Display genes as blue
 arrows in frame. Only report blast hits under 0.00001 expect value.
 Display the GC content of each file as a graph.
 
-Easyfig_CL_1.2.py -tblastx -o outfile.svg -svg ann1.embl 1 10000 ann2.embl 1 10000 R
+Easyfig.py -tblastx -o outfile.svg -svg ann1.embl 1 10000 ann2.embl 1 10000 R
 
 Show a tblastx comparison of the first 10000 base pairs of ann1.embl and ann2.embl
 Reverse compliment ann2.embl. Writes as a SVG file.
