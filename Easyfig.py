@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.2.2 10.08.2015
+# Version 2.2.3 08.11.2016
 # License: GPLv3
 
-import tkFileDialog
-import tkMessageBox
-import tkSimpleDialog
-import tkColorChooser
 import os
 import subprocess
 from math import ceil, hypot
@@ -6154,6 +6150,8 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                             minident = j[4]
                 tempsecond.append(temp)
         secondlist = tempsecond
+    if minIdent != 0:
+        minident = minIdent
     if aln == 'best blast':
         blastmatch = [0]
         for i in range(1, len(secondlist), 2):
@@ -7018,7 +7016,6 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
             totalheight += height1
         else:
             totalheight += height2
-            print minlength, mineval, minIdent
             temp = getBlast(inputlist[i], minlength, mineval, minIdent)
             for j in temp:
                 if j[4] < minident:
@@ -7047,6 +7044,8 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                             minident = j[4]
                 tempsecond.append(temp)
         secondlist = tempsecond
+    if minIdent != 0:
+        minident = minIdent
     if aln == 'best blast':
         blastmatch = [0]
         for i in range(1, len(secondlist), 2):
@@ -7735,7 +7734,7 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.2.2', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 2.2.3', font='TkDefaultFont 24 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
         self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
@@ -8377,7 +8376,7 @@ class App:
             self.defaultpreferences()
 
     def openhelpsite(self):
-        webbrowser.open_new('http://easyfig.sourceforge.net/examples.html')
+        webbrowser.open_new('https://github.com/mjsull/Easyfig/wiki')
 
     def openabout(self):
         try:
@@ -8390,12 +8389,12 @@ class App:
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.2.2\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 2.2.3\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
         self.frame7.grid(padx=10, pady=10)
-   
+
     def supportwin(self):
         try:
             self.supportpanel.destroy()
@@ -8406,7 +8405,7 @@ Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualis
         self.about1label1 = Label(self.frame9, text='Easyfig', font='TkDefaultFont 13 bold')
         self.about1label1.grid(row=0, column=0)
         self.supportlabel2 = Label(self.frame9, text='written by Mitchell Sullivan - mjsull@gmail.com\n\
-Please do not hesitate to email with issues or bug reports.')
+To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.supportlabel2.grid(row=1, column=0)
         self.frame9.grid(padx=10, pady=10)
 
@@ -8454,7 +8453,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.closeprefwinbut = Button(self.frame8, text='close', command=self.closeprefwin)
         self.closeprefwinbut.grid(column=2, row=9, sticky=E)
         self.frame8.grid(padx=20, pady=20)
-    
+
     def addpref(self):
         preffile = open('.easyfig.pref', 'a')
         savename = tkSimpleDialog.askstring('Input name', 'Please choose name to save preferences under.', parent=self.frame8)
@@ -8703,7 +8702,7 @@ Please do not hesitate to email with issues or bug reports.')
                 preffile.close()
                 self.preflist.delete(0, END)
                 self.preflist.insert('easyfig_standard')
-    
+
     def removepref(self):
         nocompare = tkMessageBox.askquestion('Delete?', 'Are you sure you wish to delete this preference?', parent=self.frame8)
         if nocompare == 'no':
@@ -8745,7 +8744,7 @@ Please do not hesitate to email with issues or bug reports.')
         for i in templist:
             self.preflist.insert(END, i)
         preffile.close()
-    
+
     def closeprefwin(self):
         self.prefwin.destroy()
 
@@ -9107,7 +9106,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.figureoptionsclosebutton.grid(row=11, column=1, sticky=E, pady=5)
         self.figureoptionswindow.geometry('+30+40')
         self.frame2.grid(padx=30, pady=10)
-    
+
     def figureoptionsclose(self):
         self.figureoptionswindow.destroy()
 
@@ -9170,7 +9169,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.blastoptionsclosebutton.grid(row=9, column=1, columnspan=4, sticky=E, pady=5)
         self.blastoptionswindow.geometry('+30+40')
         self.frame3.grid(padx=30, pady=10)
-    
+
     def blastoptionsclose(self):
         self.blastoptionswindow.destroy()
 
@@ -9274,7 +9273,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.annotateoptionsclosebutton.grid(row=11, column=3, columnspan=2, sticky=E, pady=5)
         self.annotateoptionswindow.geometry('+30+40')
         self.frame4.grid(padx=30, pady=10)
-    
+
     def annotateoptionsclose(self):
         self.annotateoptionswindow.destroy()
 
@@ -9361,7 +9360,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.ggaplabel.grid(row=13, column=0)
         self.ggapentry = Entry(self.frame5, textvariable=self.ggap, state=DISABLED)
         self.ggapentry.grid(row=13, column=1)
-        
+
         self.graphoptionsclosebutton = Button(self.frame5, text='close', command=self.graphoptionsclose)
         self.graphoptionsclosebutton.grid(row=14, column=1, columnspan=2, sticky=E, pady=5)
         self.graphoptionswindow.geometry('+30+40')
@@ -9370,7 +9369,7 @@ Please do not hesitate to email with issues or bug reports.')
 
     def graphoptionsclose(self):
         self.graphoptionswindow.destroy()
-        
+
     def opengraphfile(self):
         filename = tkFileDialog.askopenfilename(parent=self.graphoptionswindow)
         self.graphfile.set(filename)
@@ -9686,7 +9685,7 @@ Please do not hesitate to email with issues or bug reports.')
                 tkMessageBox.showerror('Try again.', 'Please generate blast files again, order of annotation files has been changed.')
                 self.running = False
                 self.createFigure.config(text="Create Figure")
-                return None            
+                return None
             getit = True
             for i in self.inputlist:
                 if not os.path.exists(i):
@@ -9745,7 +9744,7 @@ Please do not hesitate to email with issues or bug reports.')
                             self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get())
         else:
             self.theminblast = self.getPreview()
-    
+
     def getPreview(self):
         try:
             self.prevwindow.destroy()
@@ -10053,19 +10052,20 @@ Please do not hesitate to email with issues or bug reports.')
 
     def genBlast2(self):
         self.blastlist.delete(0, END)
+        the_tempdb_dir = os.path.abspath('.') + '/tempdb'
         for i in range(self.genlist.size() - 1):
             if self.dbnDir != None:
-                subprocess.Popen(self.dbnDir + ' -dbtype nucl -out tempdb -in ' + str(i + 2) +
+                subprocess.Popen(self.dbnDir + ' -dbtype nucl -out ' + the_tempdb_dir + ' -in ' + str(i + 2) +
                                  '.easyfig.fa', shell=True).wait()
             elif self.dblDir != None:
                 subprocess.Popen(self.dblDir + ' -p F -t tempdb -n tempdb -i '
                                  + str(i + 2) + '.easyfig.fa', shell=True).wait()
             if self.blastnDir:
-                subprocess.Popen(self.blastnDir + ' -task blastn -db tempdb -outfmt 6 -query ' + str(i+1)
+                subprocess.Popen(self.blastnDir + ' -task blastn -db ' + the_tempdb_dir + ' -outfmt 6 -query ' + str(i+1)
                                  + '.easyfig.fa -out ' + str(i + 1) + str(i+2) + '.easyfig.out',
                                  shell=True).wait()
             elif self.blastlDir:
-                subprocess.Popen(self.blastlDir + ' -p blastn -d tempdb -F F -m 8 -a 8 -i '
+                subprocess.Popen(self.blastlDir + ' -p blastn -d ' + the_tempdb_dir + ' -F F -m 8 -a 8 -i '
                              + str(i + 1) + '.easyfig.fa -o '
                              + str(i+1) + str(i+2) + '.easyfig.out', shell=True).wait()
             self.blastlist.insert(END, self.workingDir + '/' + str(i + 1) + str(i+2) + '.easyfig.out')
@@ -10137,7 +10137,7 @@ Please do not hesitate to email with issues or bug reports.')
                 if not os.path.exists(self.blastnDir):
                     self.blastnDir = None
             if self.dbnDir != None:
-                pass 
+                pass
             elif isNewBlastDB():
                 self.dbnDir = 'makeblastdb'
             elif isLegBlastDB():
@@ -10381,8 +10381,8 @@ Please do not hesitate to email with issues or bug reports.')
         self.annwindowclosebutton.grid(row=12, column=4, columnspan=2, sticky=E, pady=10)
         self.annwindow.geometry('+30+40')
         self.frame6.grid(padx=30, pady=10)
-    
-    
+
+
     def changecuts(self):
         thepost = self.fgenlist.curselection()
         if thepost == ():
@@ -10416,7 +10416,7 @@ Please do not hesitate to email with issues or bug reports.')
             self.fgenrevlist.selection_clear(0, END)
             self.fgenrevlist.selection_set(thepost + 1, thepost + 1)
             self.fgenrevlist.see(thepost + 1)
-    
+
     def yview2(self, *args):
         apply(self.fgenlist.yview, args)
         apply(self.fgenminlist.yview, args)
@@ -10425,7 +10425,7 @@ Please do not hesitate to email with issues or bug reports.')
 
     def onmousewheel(self, event):
         return "break"
-    
+
     def setselectedcuts(self, event):
         selected = self.fgenlist.nearest(event.y)
         tempypos = self.fgenlist.yview()[0]
@@ -10480,7 +10480,7 @@ Please do not hesitate to email with issues or bug reports.')
         self.doublecutsclosebut.grid(row=4, column=1, sticky=E)
         self.doublecutswin.geometry('+40+50')
         self.frame10.grid(padx=20, pady=20)
-        
+
     def doublecutsclose(self):
         self.fgenminlist.delete(self.doublecutsel)
         self.fgenminlist.insert(self.doublecutsel, self.dublabel2str.get())
@@ -10580,7 +10580,7 @@ Please do not hesitate to email with issues or bug reports.')
     def downloadBlastAuto(self):
         self.thedlblast = threading.Thread(target=self.downloadBlast)
         self.thedlblast.start()
-    
+
     def downloadBlastMan(self):
         theplatform = platform.system()
         architecture = platform.architecture()[0]
@@ -10644,6 +10644,12 @@ clicking ok will bring up\nthe download location\nin your browser.')
             self.processLab.config(text='Unable to Create FTP \nconnection.\nPlease dowload manually.')
             return
         filename = None
+        try:
+            true_platform = os.environ["PROCESSOR_ARCHITEW6432"]
+            if true_platform == 'AMD64':
+                architecture = '64bit'
+        except KeyError:
+            pass
         for line in files:
             if theplatform == 'Linux' and architecture == '32bit' and line.split()[8][-17:] == 'ia32-linux.tar.gz':
                 filename = line.split()[8]
@@ -10678,40 +10684,41 @@ clicking ok will bring up\nthe download location\nin your browser.')
         except:
             self.processLab.config(text='Unable to download blast.\nPlease dowload manually.')
             return
+        filenamedir = filename.split('+')[0] + '+'
         if theplatform == 'Windows':
             try:
-               shutil.move(filename[:18] + '/bin/makeblastdb.exe', self.pwd)
+               shutil.move(filenamedir + '/bin/makeblastdb.exe', self.pwd)
             except:
                pass
             try:
-                shutil.move(filename[:18] + '/bin/blastn.exe', self.pwd)
+                shutil.move(filenamedir + '/bin/blastn.exe', self.pwd)
             except:
                 pass
             try:
-                shutil.move(filename[:18] + '/bin/tblastx.exe', self.pwd)
+                shutil.move(filenamedir + '/bin/tblastx.exe', self.pwd)
             except:
                 pass
         else:
             try:
-                shutil.move(filename[:18] + '/bin/makeblastdb', self.pwd)
+                shutil.move(filenamedir + '/bin/makeblastdb', self.pwd)
             except:
                 pass
             try:
-                shutil.move(filename[:18] + '/bin/blastn', self.pwd)
+                shutil.move(filenamedir + '/bin/blastn', self.pwd)
             except:
                 pass
             try:
-                shutil.move(filename[:18] + '/bin/tblastx', self.pwd)
+                shutil.move(filenamedir + '/bin/tblastx', self.pwd)
             except:
                 pass
         tfile.close()
-        shutil.rmtree(filename[:18])
+        shutil.rmtree(filenamedir)
         os.remove(filename)
         if os.path.exists(self.pwd + '/blastn') or os.path.exists(self.pwd + '/blastn.exe'):
             self.processLab.config(text='Extracting file... Done\nBLAST+ installed.')
         else:
             self.processLab.config(text='Unable to download blast.\nPlease dowload manually.')
-            
+
 def gbk2fasta(genbank, out, mincut, maxcut):
     getseq = False
     getembl = False
@@ -11427,6 +11434,10 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
 
 elif len(sys.argv) == 1:
     from Tkinter import *
+    import tkFileDialog
+    import tkMessageBox
+    import tkSimpleDialog
+    import tkColorChooser
     class DDlistbox(Listbox):
         def __init__(self, master, **kw):
             kw['selectmode'] = SINGLE
@@ -11461,7 +11472,7 @@ Supervisor: Dr. Scott Beatson   University of Queensland    03.12.2010
 
 License: GPLv3
 
-Version 2.2.2
+Version 2.2.3
 
 Usage: Easyfig.py [options] GenBank/EMBL/fasta GenBank/EMBL/fasta GenBank/EMBL/fasta ...
 
@@ -11583,5 +11594,3 @@ Reverse compliment ann2.embl. Writes as a SVG file.
 this script uses a modified version of Paul McGuire's (http://www.geocities.com/ptmcg/ RIP (geocities, not paul))
 bmp.py - module for constructing simple BMP graphics files
 '''
-
-
