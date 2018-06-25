@@ -13,7 +13,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 setup(  name = "Easyfig",
-        version = "2.2.2",
+        version = "2.2.3",
         description = "Easy genome comparison figures.",
         options = {"build_exe": build_exe_options},
         executables = [Executable("Easyfig.py", base=base)])
