@@ -10688,14 +10688,38 @@ clicking ok will bring up\nthe download location\nin your browser.')
         if theplatform == 'Windows':
             try:
                 shutil.move(filenamedir + '/bin/makeblastdb.exe', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libgcc_s_seh-1.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libgmp-10.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libgnutls-30.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libhogweed-4-2.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libnettle-6-2.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/libp11-kit-0.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/msvcp120.dll', self.pwd)
-                shutil.move(filenamedir + '/bin/963232 msvcr120.dll', self.pwd)
+            except:
+                pass
+            try:
+                shutil.move(filenamedir + '/bin/msvcr120.dll', self.pwd)
             except:
                 pass
             try:
