@@ -10056,7 +10056,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         for i in range(self.genlist.size() - 1):
             if self.dbnDir != None:
                 subprocess.Popen(self.dbnDir + ' -dbtype nucl -out ' + the_tempdb_dir + ' -in ' + str(i + 2) +
-                                 '.easyfig.fa', shell=True).wait()
+                                 '.easyfig.fa', shell=True, env={"BLASTDB_LMDB_MAP_SIZE":"1000000"}).wait()
             elif self.dblDir != None:
                 subprocess.Popen(self.dblDir + ' -p F -t tempdb -n tempdb -i '
                                  + str(i + 2) + '.easyfig.fa', shell=True).wait()
@@ -10719,6 +10719,10 @@ clicking ok will bring up\nthe download location\nin your browser.')
             except:
                 pass
             try:
+                shutil.move(filenamedir + '/bin/nghttp2.dll', self.pwd)
+            except:
+                pass
+            try:
                 shutil.move(filenamedir + '/bin/msvcr120.dll', self.pwd)
             except:
                 pass
@@ -11057,7 +11061,7 @@ def genBlast(inlist, cutlist):
     for i in range(len(inlist) - 1):
         if isNewBlastDB():
             subprocess.Popen('makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) +
-                             '.easyfig.fa', shell=True).wait()
+                             '.easyfig.fa', shell=True, env={"BLASTDB_LMDB_MAP_SIZE":"1000000"}).wait()
             print 'makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) + '.easyfig.fa'
         elif isLegBlastDB():
             subprocess.Popen('formatdb -p F -t tempdb -n temp_easyfig/tempdb -i temp_easyfig/'
