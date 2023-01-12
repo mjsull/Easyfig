@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.2.3 08.11.2016
+# Version 2.2.4 08.11.2016
 # License: GPLv3
 
 import os
@@ -21,7 +21,7 @@ import operator
 import sys
 
 
-def colorstr(rgb): return "#%x%x%x" % (rgb[0]/16,rgb[1]/16,rgb[2]/16)
+def colorstr(rgb): return "#%02x%02x%02x" % (rgb[0],rgb[1],rgb[2])
 
 def binar(s):
   transdict = {'0':'0000',
@@ -172,7 +172,7 @@ class scalableVectorGraphics:
 
     def drawRightFrame(self, x, y, wid, ht, lt, frame, fill):
         if lt > ht /2:
-            lt = ht /2
+            lt = ht //2
         if frame == 1:
             y1 = y + ht/2
             y2 = y + ht * 3/8
@@ -197,7 +197,7 @@ class scalableVectorGraphics:
 
     def drawRightFrameRect(self, x, y, wid, ht, lt, frame, fill):
         if lt > ht /2:
-            lt = ht /2
+            lt = ht //2
         if frame == 1:
             y1 = y + ht / 4
         elif frame == 2:
@@ -211,7 +211,7 @@ class scalableVectorGraphics:
 
     def drawLeftFrame(self, x, y, wid, ht, lt, frame, fill):
         if lt > ht /2:
-            lt = ht /2
+            lt = ht //2
         if frame == 1:
             y1 = y + ht
             y2 = y + ht * 7/8
@@ -236,7 +236,7 @@ class scalableVectorGraphics:
 
     def drawLeftFrameRect(self, x, y, wid, ht, lt, frame, fill):
         if lt > ht /2:
-            lt = ht /2
+            lt = ht //2
         if frame == 1:
             y1 = y + ht * 3/4
         elif frame == 2:
@@ -386,8 +386,8 @@ def shortToString(i):
   return chr(lo) + chr(hi)
 
 def longToString(i):
-  hi = (long(i) & 0x7fff0000) >> 16
-  lo = long(i) & 0x0000ffff
+  hi = (i & 0x7fff0000) >> 16
+  lo = i & 0x0000ffff
   return shortToString(lo) + shortToString(hi)
 
 #  class
@@ -403,7 +403,7 @@ class Color(object):
 
   def __setattr__(self, name, value):
     if hasattr(self, name):
-      raise AttributeError, "Color is immutable"
+      raise AttributeError
     else:
       object.__setattr__(self, name, value)
 
@@ -411,9 +411,9 @@ class Color(object):
     return "R:%d G:%d B:%d" % (self.red, self.grn, self.blu )
 
   def __hash__( self ):
-    return ( ( long(self.blu) ) +
-              ( long(self.grn) <<  8 ) +
-              ( long(self.red) << 16 ) )
+    return ( ( self.blu ) +
+              ( self.grn <<  8 ) +
+              ( self.red << 16 ) )
 
   def __eq__( self, other ):
     return (self is other) or (self.toLong == other.toLong)
@@ -1652,7 +1652,7 @@ ffffffffffffffffffff'
   def writea(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.amatrix)
@@ -1679,7 +1679,7 @@ ffffffffffffffffffff'
   def writeb(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.bmatrix)
@@ -1706,7 +1706,7 @@ ffffffffffffffffffff'
   def writec(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.cmatrix)
@@ -1733,7 +1733,7 @@ ffffffffffffffffffff'
   def writed(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.dmatrix)
@@ -1760,7 +1760,7 @@ ffffffffffffffffffff'
   def writee(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.ematrix)
@@ -1787,7 +1787,7 @@ ffffffffffffffffffff'
   def writef(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.fmatrix)
@@ -1814,7 +1814,7 @@ ffffffffffffffffffff'
   def writeg(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.gmatrix)
@@ -1841,7 +1841,7 @@ ffffffffffffffffffff'
   def writeh(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.hmatrix)
@@ -1868,7 +1868,7 @@ ffffffffffffffffffff'
   def writei(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.imatrix)
@@ -1895,7 +1895,7 @@ ffffffffffffffffffff'
   def writej(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.jmatrix)
@@ -1922,7 +1922,7 @@ ffffffffffffffffffff'
   def writek(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.kmatrix)
@@ -1949,7 +1949,7 @@ ffffffffffffffffffff'
   def writel(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.lmatrix)
@@ -1976,7 +1976,7 @@ ffffffffffffffffffff'
   def writem(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.mmatrix)
@@ -2003,7 +2003,7 @@ ffffffffffffffffffff'
   def writen(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.nmatrix)
@@ -2030,7 +2030,7 @@ ffffffffffffffffffff'
   def writeo(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.omatrix)
@@ -2057,7 +2057,7 @@ ffffffffffffffffffff'
   def writep(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.pmatrix)
@@ -2084,7 +2084,7 @@ ffffffffffffffffffff'
   def writeq(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.qmatrix)
@@ -2111,7 +2111,7 @@ ffffffffffffffffffff'
   def writer(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.rmatrix)
@@ -2138,7 +2138,7 @@ ffffffffffffffffffff'
   def writes(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.smatrix)
@@ -2165,7 +2165,7 @@ ffffffffffffffffffff'
   def writet(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.tmatrix)
@@ -2192,7 +2192,7 @@ ffffffffffffffffffff'
   def writeu(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.umatrix)
@@ -2219,7 +2219,7 @@ ffffffffffffffffffff'
   def writev(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.vmatrix)
@@ -2246,7 +2246,7 @@ ffffffffffffffffffff'
   def writew(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.wmatrix)
@@ -2273,7 +2273,7 @@ ffffffffffffffffffff'
   def writex(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.xmatrix)
@@ -2300,7 +2300,7 @@ ffffffffffffffffffff'
   def writey(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.ymatrix)
@@ -2327,7 +2327,7 @@ ffffffffffffffffffff'
   def writez(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.zmatrix)
@@ -2354,7 +2354,7 @@ ffffffffffffffffffff'
   def writeA(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Amatrix)
@@ -2381,7 +2381,7 @@ ffffffffffffffffffff'
   def writeB(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Bmatrix)
@@ -2408,7 +2408,7 @@ ffffffffffffffffffff'
   def writeC(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Cmatrix)
@@ -2435,7 +2435,7 @@ ffffffffffffffffffff'
   def writeD(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Dmatrix)
@@ -2462,7 +2462,7 @@ ffffffffffffffffffff'
   def writeE(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Ematrix)
@@ -2489,7 +2489,7 @@ ffffffffffffffffffff'
   def writeF(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Fmatrix)
@@ -2516,7 +2516,7 @@ ffffffffffffffffffff'
   def writeG(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Gmatrix)
@@ -2543,7 +2543,7 @@ ffffffffffffffffffff'
   def writeH(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Hmatrix)
@@ -2570,7 +2570,7 @@ ffffffffffffffffffff'
   def writeI(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Imatrix)
@@ -2597,7 +2597,7 @@ ffffffffffffffffffff'
   def writeJ(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Jmatrix)
@@ -2624,7 +2624,7 @@ ffffffffffffffffffff'
   def writeK(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Kmatrix)
@@ -2651,7 +2651,7 @@ ffffffffffffffffffff'
   def writeL(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Lmatrix)
@@ -2678,7 +2678,7 @@ ffffffffffffffffffff'
   def writeM(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Mmatrix)
@@ -2705,7 +2705,7 @@ ffffffffffffffffffff'
   def writeN(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Nmatrix)
@@ -2732,7 +2732,7 @@ ffffffffffffffffffff'
   def writeO(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Omatrix)
@@ -2759,7 +2759,7 @@ ffffffffffffffffffff'
   def writeP(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Pmatrix)
@@ -2786,7 +2786,7 @@ ffffffffffffffffffff'
   def writeQ(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Qmatrix)
@@ -2813,7 +2813,7 @@ ffffffffffffffffffff'
   def writeR(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Rmatrix)
@@ -2840,7 +2840,7 @@ ffffffffffffffffffff'
   def writeS(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Smatrix)
@@ -2867,7 +2867,7 @@ ffffffffffffffffffff'
   def writeT(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Tmatrix)
@@ -2894,7 +2894,7 @@ ffffffffffffffffffff'
   def writeU(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Umatrix)
@@ -2921,7 +2921,7 @@ ffffffffffffffffffff'
   def writeV(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Vmatrix)
@@ -2948,7 +2948,7 @@ ffffffffffffffffffff'
   def writeW(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Wmatrix)
@@ -2975,7 +2975,7 @@ ffffffffffffffffffff'
   def writeX(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Xmatrix)
@@ -3002,7 +3002,7 @@ ffffffffffffffffffff'
   def writeY(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Ymatrix)
@@ -3029,7 +3029,7 @@ ffffffffffffffffffff'
   def writeZ(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.Zmatrix)
@@ -3056,7 +3056,7 @@ ffffffffffffffffffff'
   def writeone(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.onematrix)
@@ -3083,7 +3083,7 @@ ffffffffffffffffffff'
   def writetwo(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.twomatrix)
@@ -3110,7 +3110,7 @@ ffffffffffffffffffff'
   def writethree(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.threematrix)
@@ -3137,7 +3137,7 @@ ffffffffffffffffffff'
   def writefour(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.fourmatrix)
@@ -3164,7 +3164,7 @@ ffffffffffffffffffff'
   def writefive(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.fivematrix)
@@ -3191,7 +3191,7 @@ ffffffffffffffffffff'
   def writesix(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.sixmatrix)
@@ -3218,7 +3218,7 @@ ffffffffffffffffffff'
   def writeseven(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.sevenmatrix)
@@ -3245,7 +3245,7 @@ ffffffffffffffffffff'
   def writeeight(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.eightmatrix)
@@ -3272,7 +3272,7 @@ ffffffffffffffffffff'
   def writenine(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.ninematrix)
@@ -3299,7 +3299,7 @@ ffffffffffffffffffff'
   def writeten(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.tenmatrix)
@@ -3326,7 +3326,7 @@ ffffffffffffffffffff'
   def write_(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self._matrix)
@@ -3353,7 +3353,7 @@ ffffffffffffffffffff'
   def writeminus(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.minusmatrix)
@@ -3380,7 +3380,7 @@ ffffffffffffffffffff'
   def writeplus(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.plusmatrix)
@@ -3407,7 +3407,7 @@ ffffffffffffffffffff'
   def writeequal(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.equalmatrix)
@@ -3434,7 +3434,7 @@ ffffffffffffffffffff'
   def writeexcl(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.exclmatrix)
@@ -3461,7 +3461,7 @@ ffffffffffffffffffff'
   def writeat(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.atmatrix)
@@ -3488,7 +3488,7 @@ ffffffffffffffffffff'
   def writehash(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.hashmatrix)
@@ -3515,7 +3515,7 @@ ffffffffffffffffffff'
   def writedollar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.dollarmatrix)
@@ -3542,7 +3542,7 @@ ffffffffffffffffffff'
   def writepercent(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.percentmatrix)
@@ -3569,7 +3569,7 @@ ffffffffffffffffffff'
   def writehat(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.hatmatrix)
@@ -3596,7 +3596,7 @@ ffffffffffffffffffff'
   def writeamp(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.ampmatrix)
@@ -3623,7 +3623,7 @@ ffffffffffffffffffff'
   def writestrix(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.strixmatrix)
@@ -3650,7 +3650,7 @@ ffffffffffffffffffff'
   def writeopencpar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.opencparmatrix)
@@ -3677,7 +3677,7 @@ ffffffffffffffffffff'
   def writeclosecpar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.closecparmatrix)
@@ -3704,7 +3704,7 @@ ffffffffffffffffffff'
   def writeopenspar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.opensparmatrix)
@@ -3731,7 +3731,7 @@ ffffffffffffffffffff'
   def writeclosespar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.closesparmatrix)
@@ -3758,7 +3758,7 @@ ffffffffffffffffffff'
   def writebackslash(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.backslashmatrix)
@@ -3785,7 +3785,7 @@ ffffffffffffffffffff'
   def writesemicol(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.semicolmatrix)
@@ -3812,7 +3812,7 @@ ffffffffffffffffffff'
   def writepost(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.postmatrix)
@@ -3839,7 +3839,7 @@ ffffffffffffffffffff'
   def writecomma(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.commamatrix)
@@ -3866,7 +3866,7 @@ ffffffffffffffffffff'
   def writefullstop(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.fullstopmatrix)
@@ -3893,7 +3893,7 @@ ffffffffffffffffffff'
   def writeforslash(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.forslashmatrix)
@@ -3920,7 +3920,7 @@ ffffffffffffffffffff'
   def writelesthan(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.lesthanmatrix)
@@ -3947,7 +3947,7 @@ ffffffffffffffffffff'
   def writegreatthan(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.greatthanmatrix)
@@ -3974,7 +3974,7 @@ ffffffffffffffffffff'
   def writequestion(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.questionmatrix)
@@ -4001,7 +4001,7 @@ ffffffffffffffffffff'
   def writecolon(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.colonmatrix)
@@ -4028,7 +4028,7 @@ ffffffffffffffffffff'
   def writequote(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.quotematrix)
@@ -4055,7 +4055,7 @@ ffffffffffffffffffff'
   def writeopensquig(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.opensquigmatrix)
@@ -4082,7 +4082,7 @@ ffffffffffffffffffff'
   def writeclosesquig(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.closesquigmatrix)
@@ -4109,7 +4109,7 @@ ffffffffffffffffffff'
   def writebar(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.barmatrix)
@@ -4136,7 +4136,7 @@ ffffffffffffffffffff'
   def writemisc(self, x, y, size, ital, bold, sans, rotate):
     xpos = x
     sizeratio = size * 1.0 / self.defsize
-    sizeint = (size - 1) / self.defsize + 1
+    sizeint = (size - 1) // self.defsize + 1
     if bold:
       sizeint = sizeint + 2 + int(sizeratio)
     charstring = binar(self.miscmatrix)
@@ -4963,7 +4963,7 @@ ffffffffffffffffffff'
         self.drawLine(x,y,x,y+ht-1)
     else:
       if lt > wid/2 and lt != 1:
-        lt = wid/2
+        lt = wid//2
       if lt > ht/2 and lt != 1:
         lt = ht/2
       self.drawRect(x,y,wid,ht,True)
@@ -5102,7 +5102,7 @@ ffffffffffffffffffff'
 
   def drawLeftArrow(self, x, y, wid, ht, lt, outline=True):
     if lt > ht /2:
-        lt = ht/2
+        lt = ht//2
     y1 = y + (ht/2)
     x1 = x + wid
     x2 = x + ht/2
@@ -5125,7 +5125,7 @@ ffffffffffffffffffff'
         self.setPenColor(temp)
     else:
       if lt > wid /2:
-          lt = wid/2
+          lt = wid//2
       for i in range(y, y+ht+1):
         self.drawLine(x, y1, x1, i)
       if outline and lt != 0:
@@ -5142,7 +5142,7 @@ ffffffffffffffffffff'
 
   def drawRightFrame(self, x, y, wid, ht, lt, frame, outline=True):
     if lt > ht /2:
-      lt = ht /2
+      lt = ht //2
     if frame == 1:
       y1 = y + ht/2
       y2 = y + ht * 5/8
@@ -5185,7 +5185,7 @@ ffffffffffffffffffff'
 
   def drawRightFrameRect(self, x, y, wid, ht, lt, frame, outline=True):
     if lt > ht /2:
-      lt = ht /2
+      lt = ht //2
     if frame == 1:
       y1 = y + ht/2
       y3 = y + ht * 3/4
@@ -5211,7 +5211,7 @@ ffffffffffffffffffff'
 
   def drawLeftFrame(self, x, y, wid, ht, lt, frame, outline=True):
     if lt > ht /2:
-      lt = ht /2
+      lt = ht //2
     if frame == 1:
       y1 = y
       y2 = y + ht /8
@@ -5254,7 +5254,7 @@ ffffffffffffffffffff'
 
   def drawLeftFrameRect(self, x, y, wid, ht, lt, frame, outline=True):
     if lt > ht /2:
-      lt = ht /2
+      lt = ht //2
     if frame == 1:
       y1 = y
       y3 = y + ht/4
@@ -5535,116 +5535,41 @@ ffffffffffffffffffff'
 
   def _saveBitMapNoCompression( self, filename ):
     # open file
-    f = file( filename, "wb" )
+    with open( filename, "wb" ) as f:
 
     # write bitmap header
-    f.write( "BM" )
-    f.write( longToString( 54 + 256*4 + self.ht*self.wd ) )   # DWORD size in bytes of the file
-    f.write( longToString( 0 ) )    # DWORD 0
-    f.write( longToString( 54 + 256*4 ) )    # DWORD offset to the data
-    f.write( longToString( 40 ) )    # DWORD header size = 40
-    f.write( longToString( self.wd ) )    # DWORD image width
-    f.write( longToString( self.ht ) )    # DWORD image height
-    f.write( shortToString( 1 ) )    # WORD planes = 1
-    f.write( shortToString( 8 ) )    # WORD bits per pixel = 8
-    f.write( longToString( 0 ) )    # DWORD compression = 0
-    f.write( longToString( self.wd * self.ht ) )    # DWORD sizeimage = size in bytes of the bitmap = width * height
-    f.write( longToString( 0 ) )    # DWORD horiz pixels per meter (?)
-    f.write( longToString( 0 ) )    # DWORD ver pixels per meter (?)
-    f.write( longToString( 256 ) )    # DWORD number of s used = 256
-    f.write( longToString( len(self.palette) ) )    # DWORD number of "import s = len( self.palette )
+        f.write((b"BM") )
+        f.write(( 54 + 256*4 + self.ht*self.wd ).to_bytes(4, byteorder='little', signed=False ))   # DWORD size in bytes of the file
+        f.write( ( 0 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD 0
+        f.write( ( 54 + 256*4 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD offset to the data
+        f.write( ( 40 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD header size = 40
+        f.write( ( self.wd ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD image width
+        f.write( ( self.ht ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD image height
+        f.write( ( 1 ).to_bytes(2, byteorder='little', signed=False ) )    # WORD planes = 1
+        f.write( ( 8 ).to_bytes(2, byteorder='little', signed=False ) )    # WORD bits per pixel = 8
+        f.write( ( 0 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD compression = 0
+        f.write( ( self.wd * self.ht ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD sizeimage = size in bytes of the bitmap = width * height
+        f.write( ( 0 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD horiz pixels per meter (?)
+        f.write( ( 0 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD ver pixels per meter (?)
+        f.write( ( 256 ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD number of s used = 256
+        f.write( ( len(self.palette) ).to_bytes(4, byteorder='little', signed=False ) )    # DWORD number of "import s = len( self.palette )
 
-    # write bitmap palette
-    for clr in self.palette:
-      f.write( longToString( clr ) )
-    for i in range( len(self.palette), 256 ):
-      f.write( longToString( 0 ) )
+        # write bitmap palette
+        for clr in self.palette:
+          f.write( ( clr ).to_bytes(4, byteorder='little', signed=False ) )
+        for i in range( len(self.palette), 256 ):
+          f.write( ( 0 ).to_bytes(4, byteorder='little', signed=False ) )
+    
+        # write pixels
+        for row in self.bitarray:
+          for pixel in row:
+            f.write( ( pixel ).to_bytes(1, byteorder='little', signed=False ) )
+          padding = ( 4 - len(row) % 4 ) % 4
+          for i in range(padding):
+            f.write( ( 0 ).to_bytes(1, byteorder='little', signed=False  ) )
 
-    # write pixels
-    for row in self.bitarray:
-      for pixel in row:
-        f.write( chr( pixel ) )
-      padding = ( 4 - len(row) % 4 ) % 4
-      for i in range(padding):
-        f.write( chr( 0 ) )
-
-    # close file
-    f.close()
-
-  def _saveBitMapWithCompression( self, filename ):
-    """
-    """
-    # open file
-    f = file( filename, "wb" )
-
-    # write bitmap header
-    f.write( "BM" )
-    f.write( longToString( 54 + 256*4 + self.ht*self.wd ) )   # DWORD size in bytes of the file
-    f.write( longToString( 0 ) )    # DWORD 0
-    f.write( longToString( 54 + 256*4 ) )    # DWORD offset to the data
-    f.write( longToString( 40 ) )    # DWORD header size = 40
-    f.write( longToString( self.wd ) )    # DWORD image width
-    f.write( longToString( self.ht ) )    # DWORD image height
-    f.write( shortToString( 1 ) )    # WORD planes = 1
-    f.write( shortToString( 8 ) )    # WORD bits per pixel = 8
-    f.write( longToString( 1 ) )    # DWORD compression = 1=RLE8
-    f.write( longToString( self.wd * self.ht ) )    # DWORD sizeimage = size in bytes of the bitmap = width * height
-    f.write( longToString( 0 ) )    # DWORD horiz pixels per meter (?)
-    f.write( longToString( 0 ) )    # DWORD ver pixels per meter (?)
-    f.write( longToString( 256 ) )    # DWORD number of s used = 256
-    f.write( longToString( len(self.palette) ) )    # DWORD number of "import s = len( self.palette )
-
-    # write bitmap palette
-    for clr in self.palette:
-      f.write( longToString( clr ) )
-    for i in range( len(self.palette), 256 ):
-      f.write( longToString( 0 ) )
-
-    # write pixels
-    pixelBytes = 0
-    for row in self.bitarray:
-      rleStart = 0
-      curPixel = rleStart+1
-      while curPixel < len(row):
-        if row[curPixel] != row[rleStart] or curPixel-rleStart == 255:
-          # write out from rleStart thru curPixel-1
-          f.write( chr( curPixel-rleStart ) )
-          f.write( chr( row[rleStart] ) )
-          pixelBytes += 2
-          rleStart = curPixel
-        else:
-          pass
-        curPixel += 1
-
-      # write out last run of s
-      f.write( chr( curPixel-rleStart ) )
-      f.write( chr( row[rleStart] ) )
-      pixelBytes += 2
-
-      # end of line code
-      f.write( chr(0) )
-      f.write( chr(0) )
-      pixelBytes += 2
-
-    # end of bitmap code
-    f.write( chr(0) )
-    f.write( chr(1) )
-    pixelBytes += 2
-
-    # now fix sizes in header
-    f.seek(2)
-    f.write( longToString( 54 + 256*4 + pixelBytes ) )   # DWORD size in bytes of the file
-    f.seek(34)
-    f.write( longToString( pixelBytes ) )   # DWORD size in bytes of the file
-
-    # close file
-    f.close()
-
-  def saveFile( self, filename, compress=True ):
-    if compress:
-      self._saveBitMapWithCompression( filename )
-    else:
-      self._saveBitMapNoCompression( filename )
+  def saveFile( self, filename ):
+    self._saveBitMapNoCompression( filename )
 
 
 
@@ -5777,7 +5702,7 @@ def getArrows(filename, legname):
                             temp[1].append(int(stop))
                     except:
                         if gotit:
-                            print 'feature could not be processed:\n' + line
+                            sys.stderr.write('feature could not be processed:\n{}\n'.format(line))
                         gotit = False
                 if gotit:
                     aninstance = feature(temp[0], temp[1], feat, strand, None, None)
@@ -5823,7 +5748,7 @@ def getArrows(filename, legname):
                     aninstance = feature(int(start), int(stop), feat, strand, None, None)
                     outlist.append(aninstance)
                 except:
-                    print 'feature could not be processed:\n' + line
+                    sys.stderr.write('feature could not be processed:\n{}\n'.format(line))
                 if feat == 'source':
                     try:
                         lengtht = max([int(start), int(stop)])
@@ -5843,7 +5768,7 @@ def getArrows(filename, legname):
                     artColour = (int(artColourF[0]), int(artColourF[1]), int(artColourF[2]))
                 outlist[-1].colour = artColour
             except:
-                print 'Colour could not be processed:\n' + line
+                sys.stderr.write('Colour could not be processed:\n{}\n'.format(line))
         elif line[2:].startswith('                 /color=') and getFeats:
             temp = line[26:-1]
             temp = temp.replace('"', '')
@@ -5856,7 +5781,7 @@ def getArrows(filename, legname):
                     artColour = (int(artColourF[0]), int(artColourF[1]), int(artColourF[2]))
                 outlist[-1].colour = artColour
             except:
-                print 'Colour could not be processed:\n' + line
+                sys.stderr.write('Colour could not be processed:\n{}\n'.format(line))
         elif line[2:].startswith('                   /colour=') and getFeats:
             temp = line[29:-1]
             temp = temp.replace('"', '')
@@ -5869,7 +5794,7 @@ def getArrows(filename, legname):
                     artColour = (int(artColourF[0]), int(artColourF[1]), int(artColourF[2]))
                 outlist[-1].colour = artColour
             except:
-                print 'Colour could not be processed:\n' + line
+                sys.stderr.write('Colour could not be processed:\n{}\n'.format(line))
         elif line[2:].startswith('                   /color=') and getFeats:
             temp = line[28:-1]
             temp = temp.replace('"', '')
@@ -5881,7 +5806,7 @@ def getArrows(filename, legname):
                 else:
                     artColour = (int(artColourF[0]), int(artColourF[1]), int(artColourF[2]))
             except:
-                print 'Colour could not be processed:\n' + line
+                sys.stderr.write('Colour could not be processed:\n{}\n'.format(line))
             outlist[-1].colour = artColour
         elif line[2:].startswith('                   /gene=') and getFeats and legname == 'gene':
             outlist[-1].name = line.rstrip()[27:].replace('"', '')
@@ -5905,13 +5830,13 @@ def getArrows(filename, legname):
         elif getgenseq:
             theseq += ''.join(line.split()[1:])
     if getmultifasta:
-        insertSize = len(theseq) / 500
+        insertSize = len(theseq) // 500
         multifastapos = 1
         for i in theseq.split('qqq'):
             aninstance = feature(multifastapos, multifastapos + len(i) - 1, 'contig', '+', None, None)
             outlist.append(aninstance)
             multifastapos += len(i) -1 + insertSize
-    theseq = theseq.replace('qqq', 'n' * (len(theseq) / 500))
+    theseq = theseq.replace('qqq', 'n' * (len(theseq) // 500))
     if length == None and theseq != '':
         length = len(theseq)
     return length, outlist
@@ -6010,7 +5935,7 @@ def getBlast(filename, minlength, mineval, minident):
 #draws teh image
 def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
-         compress, reverseList, featDict, glt, exont, genet, featlengths, aln,
+         reverseList, featDict, glt, exont, genet, featlengths, aln,
          graphit, blastoutline, minmaxlist, autodetect, legend, legname, writebmp=0):
     # global variable for stopping script midway
     global abortCaptain
@@ -6024,20 +5949,20 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
         if i % 2 == 0:
             temp = getArrows(inputlist[i], legname)
             thirdlist = []
-            if minmaxlist[i/2][1] == 'Max':
+            if minmaxlist[i//2][1] == 'Max':
                 if temp[0] == None:
-                    maxcut = featlengths[i/2]
+                    maxcut = featlengths[i//2]
                 else:
                     maxcut = temp[0]
-                if minmaxlist[i/2][0] == 1:
+                if minmaxlist[i//2][0] == 1:
                     minmaxopt = 0
                 else:
                     minmaxopt = 1
-                    mincut = minmaxlist[i/2][0]
+                    mincut = minmaxlist[i//2][0]
             else:
-                mincut = minmaxlist[i/2][0]
-                maxcut = minmaxlist[i/2][1]
-                if minmaxlist[i/2][0] < minmaxlist[i/2][1]:
+                mincut = minmaxlist[i//2][0]
+                maxcut = minmaxlist[i//2][1]
+                if minmaxlist[i//2][0] < minmaxlist[i//2][1]:
                     minmaxopt = 1
                 else:
                     minmaxopt = 2
@@ -6064,7 +5989,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                                 thirdlist.append(aninstance)
                     elif minmaxopt == 2:
                         if temp[0] == None:
-                            templength = featlengths[i/2]
+                            templength = featlengths[i//2]
                         else:
                             templength = temp[0]
                         if type(j.start) == int:
@@ -6100,9 +6025,9 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
             thirdlist.sort(key=lambda ii: ii.length(), reverse=True)
             if minmaxopt == 0:
                 if temp[0] == None:
-                    secondlist.append((featlengths[i/2], thirdlist))
-                    if featlengths[i/2] > maxlength:
-                        maxlength = featlengths[i/2]
+                    secondlist.append((featlengths[i//2], thirdlist))
+                    if featlengths[i//2] > maxlength:
+                        maxlength = featlengths[i//2]
                 else:
                     secondlist.append((temp[0], thirdlist))
                     if temp[0] > maxlength:
@@ -6113,7 +6038,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                     maxlength = maxcut - mincut + 1
             elif minmaxopt == 2:
                 if temp[0] == None:
-                    templength = featlengths[i/2]
+                    templength = featlengths[i//2]
                 else:
                     templength = temp[0]
                 secondlist.append((templength - mincut + maxcut + 1, thirdlist))
@@ -6162,11 +6087,11 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                     maxbitscore = j[1] - j[0]
             if len(secondlist[i]) == 0:
                 theQstart = 0
-            elif reverseList[i/2]:
+            elif reverseList[i//2]:
                 theQstart = secondlist[i-1][0] - qend
             else:
                 theQstart = qstart
-            if reverseList[(i+1)/2]:
+            if reverseList[(i+1)//2]:
                 if len(secondlist[i]) == 0:
                     theRstart = 0
                 elif rstart < rend:
@@ -6187,8 +6112,8 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
             templist.append(i - theminblast)
         blastmatch = templist
         for i in range(0, len(secondlist) + 1, 2):
-            if secondlist[i][0] + blastmatch[i/2] > maxlength:
-                maxlength = secondlist[i][0] + blastmatch[i/2]
+            if secondlist[i][0] + blastmatch[i//2] > maxlength:
+                maxlength = secondlist[i][0] + blastmatch[i//2]
     leghei = 0
     if legend == 'Single column' or legend == 'Two columns':
         legendArrows = set()
@@ -6203,7 +6128,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                             tempjstart = j.start
                         else:
                             tempjstart = j.start[0]
-                        legendList[i/2].append((j.name, j.colour, featDict[j.type][0], tempjstart))
+                        legendList[i//2].append((j.name, j.colour, featDict[j.type][0], tempjstart))
         if legend == 'Single column':
             leghei += min([5000, len(legendArrows) * 90])
         elif legend == 'Two columns':
@@ -6401,7 +6326,6 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                 x.reverse()
             legendArrows += x
         for i in range(columnhei - 74, 10, -90):
-         #   print len(legendArrows), legendArrows[index][2]
             if index < len(legendArrows) and legendArrows[index][2] == 'rect':
                 theColor = Color(legendArrows[index][1][0], legendArrows[index][1][1], legendArrows[index][1][2])
                 bmp.setPenColor(theColor)
@@ -6426,8 +6350,6 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                 bmp.drawPointer(34, i, 64, genet)
                 bmp.setPenColor(Color.BLACK)
                 bmp.writeString(legendArrows[index][0], 106, i, 64)
-            else:
-                print 'wang'
             index += 1
     elif legend == 'Two columns':
         index = 0
@@ -6666,11 +6588,11 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
         # draws the blast figure
         if i % 2 == 0:
             if aln == 'best blast':
-                shifter = blastmatch[i/2]
-            genrev1 = reverseList[i/2]
-            ymod = totalheight - (height1 * i/2 + height2 * i/2) - height1
+                shifter = blastmatch[i//2]
+            genrev1 = reverseList[i//2]
+            ymod = totalheight - (height1 * i//2 + height2 * i//2) - height1
             if graphit != None and len(thearray) > 1:
-                ymod += (gheight + 2 * ggap) * (len(thearray) - i/2 - 1)
+                ymod += (gheight + 2 * ggap) * (len(thearray) - i//2 - 1)
             if legend == 'Top' or legend == 'Top & Bottom':
                 ymod -= sum(toplegpos[:3]) + 40
             length = secondlist[i][0]
@@ -6800,12 +6722,12 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                             x1, x2 = x3, x4
         else:
             # draws teh blast hits
-            genrev2 = reverseList[(i+1)/2]
+            genrev2 = reverseList[(i+1)//2]
             length1 = secondlist[i-1][0]
             length2 = secondlist[i+1][0]
             ymod = totalheight - (height1 * (i - 1)/2 + height2 * (i - 1)/2) - height1 - 1
             if graphit != None and len(thearray) > 1:
-                ymod += (gheight + 2 * ggap) * (len(thearray) - i/2 - 1)
+                ymod += (gheight + 2 * ggap) * (len(thearray) - i//2 - 1)
             if legend == 'Top' or legend == 'Top & Bottom':
                 ymod -= sum(toplegpos[:3]) + 40
             y1 = ymod
@@ -6837,7 +6759,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                 theColor = Color(r1, r2, r3)
                 bmp.setPenColor(theColor)
                 if aln == 'best blast':
-                    shifter = blastmatch[i/2]
+                    shifter = blastmatch[i//2]
                 if genrev1:
                     x1e = convertPosR(length1, maxlength, width, qStart, aln)
                     x1s = convertPosR(length1, maxlength, width, qEnd, aln)
@@ -6845,7 +6767,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                     x1s = convertPos(length1, maxlength, width, qStart, aln)
                     x1e = convertPos(length1, maxlength, width, qEnd, aln)
                 if aln == 'best blast':
-                    shifter = blastmatch[(i+1)/2]
+                    shifter = blastmatch[(i+1)//2]
                 if genrev2 and rStart < rEnd:
                     x2e = convertPosR(length2, maxlength, width, rStart, aln)
                     x2s = convertPosR(length2, maxlength, width, rEnd, aln)
@@ -6893,7 +6815,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
                     bmp.drawLine(x1s, y1, x2s, y2)
                     bmp.drawLine(x1e, y1, x2e, y2)
     if writebmp == 0:
-        bmp.saveFile(filename, compress)
+        bmp.saveFile(filename)
         return minident
     elif writebmp == 1:
         return bmp.createGIFString(True), minident, bmp.wd, bmp.ht
@@ -6902,7 +6824,7 @@ def draw(filename, minlength, mineval, minIdent, inputlist, width, height1, heig
 
 def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
-         compress, reverseList, featDict, glt, exont, genet, featlengths, aln,
+         reverseList, featDict, glt, exont, genet, featlengths, aln,
          graphit, blastoutline, minmaxlist, autodetect, legend, legname):
     # global variable for stopping script midway
     global abortCaptain
@@ -6916,20 +6838,20 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
         if i % 2 == 0:
             temp = getArrows(inputlist[i], legname)
             thirdlist = []
-            if minmaxlist[i/2][1] == 'Max':
+            if minmaxlist[i//2][1] == 'Max':
                 if temp[0] == None:
-                    maxcut = featlengths[i/2]
+                    maxcut = featlengths[i//2]
                 else:
                     maxcut = temp[0]
-                if minmaxlist[i/2][0] == 1:
+                if minmaxlist[i//2][0] == 1:
                     minmaxopt = 0
                 else:
                     minmaxopt = 1
-                    mincut = minmaxlist[i/2][0]
+                    mincut = minmaxlist[i//2][0]
             else:
-                mincut = minmaxlist[i/2][0]
-                maxcut = minmaxlist[i/2][1]
-                if minmaxlist[i/2][0] < minmaxlist[i/2][1]:
+                mincut = minmaxlist[i//2][0]
+                maxcut = minmaxlist[i//2][1]
+                if minmaxlist[i//2][0] < minmaxlist[i//2][1]:
                     minmaxopt = 1
                 else:
                     minmaxopt = 2
@@ -6956,7 +6878,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                                 thirdlist.append(aninstance)
                     elif minmaxopt == 2:
                         if temp[0] == None:
-                            templength = featlength[i/2]
+                            templength = featlength[i//2]
                         else:
                             templength = temp[0]
                         if type(j.start) == int:
@@ -6992,9 +6914,9 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
             thirdlist.sort(key=lambda i: i.length(), reverse=True)
             if minmaxopt == 0:
                 if temp[0] == None:
-                    secondlist.append((featlengths[i/2], thirdlist))
-                    if featlengths[i/2] > maxlength:
-                        maxlength = featlengths[i/2]
+                    secondlist.append((featlengths[i//2], thirdlist))
+                    if featlengths[i//2] > maxlength:
+                        maxlength = featlengths[i//2]
                 else:
                     secondlist.append((temp[0], thirdlist))
                     if temp[0] >= maxlength:
@@ -7007,7 +6929,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                     maxlength = maxcut - mincut + 1
             elif minmaxopt == 2:
                 if temp[0] == None:
-                    templength = featlengths[i/2]
+                    templength = featlengths[i//2]
                 else:
                     templength = temp[0]
                 secondlist.append((templength - mincut + maxcut + 1, thirdlist))
@@ -7056,11 +6978,11 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                     maxbitscore = j[1] - j[0]
             if len(secondlist[i]) == 0:
                 theQstart = 0
-            elif reverseList[i/2]:
+            elif reverseList[i//2]:
                 theQstart = secondlist[i-1][0] - qend
             else:
                 theQstart = qstart
-            if reverseList[(i+1)/2]:
+            if reverseList[(i+1)//2]:
                 if len(secondlist[i]) == 0:
                     theRstart = 0
                 elif rstart < rend:
@@ -7081,8 +7003,8 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
             templist.append(i - theminblast)
         blastmatch = templist
         for i in range(0, len(secondlist) + 1, 2):
-            if secondlist[i][0] + blastmatch[i/2] > maxlength:
-                maxlength = secondlist[i][0] + blastmatch[i/2]
+            if secondlist[i][0] + blastmatch[i//2] > maxlength:
+                maxlength = secondlist[i][0] + blastmatch[i//2]
     fighei = 0
     if legend == 'Single column' or legend == 'Two columns':
         legendArrows = set()
@@ -7097,7 +7019,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                             tempjstart = j.start
                         else:
                             tempjstart = j.start[0]
-                        legendList[i/2].append((j.name, j.colour, featDict[j.type][0], tempjstart))
+                        legendList[i//2].append((j.name, j.colour, featDict[j.type][0], tempjstart))
         if legend == 'Single column':
             fighei = min([5000, len(legendArrows) * 90])
         elif legend == 'Two columns':
@@ -7493,11 +7415,11 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
         # draws the blast figure
         if i % 2 == 0:
             if aln == 'best blast':
-                shifter = blastmatch[i/2]
-            genrev1 = reverseList[i/2]
-            ymod = (height1 * i/2 + height2 * i/2)
+                shifter = blastmatch[i//2]
+            genrev1 = reverseList[i//2]
+            ymod = (height1 * i//2 + height2 * i//2)
             if graphit != None:
-                ymod += (gheight + 2 * ggap) * (min([len(thearray), i/2 + 1]))
+                ymod += (gheight + 2 * ggap) * (min([len(thearray), i//2 + 1]))
             if legend == 'Top' or legend == 'Top & Bottom':
                 ymod += sum(toplegpos[:3]) + 40
             length = secondlist[i][0]
@@ -7610,12 +7532,12 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                             x1, x2 = x3, x4
         else:
             # draws teh blast hits
-            genrev2 = reverseList[(i+1)/2]
+            genrev2 = reverseList[(i+1)//2]
             length1 = secondlist[i-1][0]
             length2 = secondlist[i+1][0]
             ymod = (height1 * (i - 1)/2 + height2 * (i - 1)/2) - 1 + height1
             if graphit != None:
-                ymod += (gheight + 2 * ggap) * (min([len(thearray), i/2 + 1]))
+                ymod += (gheight + 2 * ggap) * (min([len(thearray), i//2 + 1]))
             if legend == 'Top' or legend == 'Top & Bottom':
                 ymod += sum(toplegpos[:3]) + 40
             y1 = ymod
@@ -7645,7 +7567,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                     r2 = int(minblastc[1] * (1 - ratio) + maxblastc[1] * ratio)
                     r3 = int(minblastc[2] * (1 - ratio) + maxblastc[2] * ratio)
                 if aln == 'best blast':
-                    shifter = blastmatch[i/2]
+                    shifter = blastmatch[i//2]
                 if genrev1:
                     x1e = convertPosR(length1, maxlength, width, qStart, aln)
                     x1s = convertPosR(length1, maxlength, width, qEnd, aln)
@@ -7653,7 +7575,7 @@ def drawsvg(filename, minlength, mineval, minIdent, inputlist, width, height1, h
                     x1s = convertPos(length1, maxlength, width, qStart, aln)
                     x1e = convertPos(length1, maxlength, width, qEnd, aln)
                 if aln == 'best blast':
-                    shifter = blastmatch[(i+1)/2]
+                    shifter = blastmatch[(i+1)//2]
                 if genrev2 and rStart < rEnd:
                     x2e = convertPosR(length2, maxlength, width, rStart, aln)
                     x2s = convertPosR(length2, maxlength, width, rEnd, aln)
@@ -7734,7 +7656,7 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.2.3', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 2.2.4', font='TkDefaultFont 24 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
         self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
@@ -8389,7 +8311,7 @@ class App:
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.2.3\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 2.2.4\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
@@ -9445,7 +9367,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         if self.outfile.get() == '' and not self.filetype.get().startswith('Preview'):
             return None
         try:
-            if self.thegenblast.isAlive():
+            if self.thegenblast.is_alive():
                 tkMessageBox.showerror('Please wait', 'BLAST already running.')
                 return None
         except:
@@ -9633,7 +9555,6 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
                 self.running = False
                 self.createFigure.config(text="Create Figure")
                 return None
-            self.compress = False
             if self.drawfig1.get() == 1:
                 self.vardrawfig1 = True
             else:
@@ -9703,7 +9624,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
                 self.thethread2.start()
 
     def dotdotdot(self):
-        while self.thethread.isAlive():
+        while self.thethread.is_alive():
             time.sleep(0.5)
             self.processLab.config(text='Drawing figure..')
             time.sleep(0.5)
@@ -9728,7 +9649,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
             self.theminblast = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
                             self.inputlist, self.figwidth, self.height1, self.height2,
                             self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
-                            False, self.compress, self.reverseList, self.featDict, self.glt,
+                            False, self.reverseList, self.featDict, self.glt,
                             self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
                             self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get())
         elif self.filetype.get() == 'Vector file (svg)':
@@ -9739,7 +9660,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
             self.theminblast = drawsvg(theoutfile, self.minlength, self.mineval, self.minIdent,
                             self.inputlist, self.figwidth, self.height1, self.height2,
                             self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
-                            False, self.compress, self.reverseList, self.featDict, self.glt,
+                            False, self.reverseList, self.featDict, self.glt,
                             self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
                             self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get())
         else:
@@ -9755,14 +9676,14 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
             testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
                     self.inputlist, self.figwidth, self.height1, self.height2,
                     self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
-                    False, self.compress, self.reverseList, self.featDict, self.glt,
+                    False, self.reverseList, self.featDict, self.glt,
                     self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
                     self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), 1)
         else:
            testit, self.theminblast, width, height = draw(theoutfile, self.minlength, self.mineval, self.minIdent,
                     self.inputlist, self.figwidth, self.height1, self.height2,
                     self.minblastc, self.maxblastc, self.minblastci, self.maxblastci, self.vardrawfig1, self.drawfig2,
-                    False, self.compress, self.reverseList, self.featDict, self.glt,
+                    False, self.reverseList, self.featDict, self.glt,
                     self.exont, self.genet, self.genlengths, self.aln.get(), self.vargraphit, self.varblastoutline,
                     self.minmaxlist, self.autodetect.get() == 1, self.theleg, self.legname.get(), 2)
         self.prevwindow = Toplevel()
@@ -9803,7 +9724,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
             if mincut < 1: mincut = 1
             if maxcut != 'Max':
                 maxcut = int(maxcut)
-            if maxcut < 1: maxcut = 1
+                if maxcut < 1: maxcut = 1
         except:
             tkMessageBox.showerror('Try again.', 'Annotation slice values not valid.')
         try:
@@ -9848,17 +9769,17 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
                 maxcut = len(seq)
             if mincut == 1 and maxcut == len(seq):
                 if getmultifa:
-                    seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                    seq = seq.replace('qqq', 'n' * (len(seq) // 500))
                 outfile.write(seq)
             elif mincut < maxcut:
                 seq = seq[mincut-1:maxcut]
                 if getmultifa:
-                    seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                    seq = seq.replace('qqq', 'n' * (len(seq) // 500))
                 outfile.write(seq)
             else:
                 seq = seq[mincut-1:] + seq[:maxcut]
                 if getmultifa:
-                    seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                    seq = seq.replace('qqq', 'n' * (len(seq) // 500))
                 outfile.write(seq)
             if len(seq) == 0:
                 tkMessageBox.showerror('Try again.', 'There is no sequence in ' + genbank + '.')
@@ -9871,19 +9792,19 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
 
     def genBlast(self):
         try:
-            if self.thegenblast.isAlive():
+            if self.thegenblast.is_alive():
                 tkMessageBox.showerror('Please wait', 'BLAST already running.')
                 return None
         except:
             pass
         try:
-            if self.thethread.isAlive():
+            if self.thethread.is_alive():
                 tkMessageBox.showerror('Please wait', 'easyfig creating figure.')
                 return None
         except:
             pass
         try:
-            if self.thedlblast.isAlive():
+            if self.thedlblast.is_alive():
                 tkMessageBox.showerror('Please wait', 'Blast is downloading.')
                 return None
         except:
@@ -10038,7 +9959,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
 
 
     def genBlastDot(self):
-        while self.thegenblast.isAlive():
+        while self.thegenblast.is_alive():
             time.sleep(0.5)
             self.processLab.config(text='Performing blastn.')
             time.sleep(0.5)
@@ -10084,19 +10005,19 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
 
     def genBlastX(self):
         try:
-            if self.thegenblast.isAlive():
+            if self.thegenblast.is_alive():
                 tkMessageBox.showerror('Please wait', 'BLAST already running.')
                 return None
         except:
             pass
         try:
-            if self.thethread.isAlive():
+            if self.thethread.is_alive():
                 tkMessageBox.showerror('Please wait', 'easyfig creating figure.')
                 return None
         except:
             pass
         try:
-            if self.thedlblast.isAlive():
+            if self.thedlblast.is_alive():
                 tkMessageBox.showerror('Please wait', 'Blast is downloading.')
                 return None
         except:
@@ -10241,7 +10162,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
             self.thegenblast2.start()
 
     def genBlastXdot(self):
-        while self.thegenblast.isAlive():
+        while self.thegenblast.is_alive():
             time.sleep(0.5)
             self.processLab.config(text='Performing tblastx.')
             time.sleep(0.5)
@@ -10767,7 +10688,7 @@ def gbk2fasta(genbank, out, mincut, maxcut):
             maxcut = int(maxcut)
         if maxcut < 1: maxcut = 1
     except:
-        print 'Annotation slice values not valid.'
+        sys.stderr.write('Annotation slice values not valid.\n')
     try:
         gen = open(genbank)
         outfile = open(out, 'w')
@@ -10798,7 +10719,7 @@ def gbk2fasta(genbank, out, mincut, maxcut):
                 if not i in rightchars:
                     isitgood = False
             if not isitgood:
-                print 'Annotation file contains invalid characters. Check genbank/EMBL contains no lines starting with > or that fasta file contains only valid nucleotides'
+                sys.stderr.write('Annotation file contains invalid characters. Check genbank/EMBL contains no lines starting with > or that fasta file contains only valid nucleotides\n')
                 return 0
         if '/' in out:
             outfile.write('>' + out.split('/')[1] + '\n')
@@ -10808,25 +10729,25 @@ def gbk2fasta(genbank, out, mincut, maxcut):
             maxcut = len(seq)
         if mincut == 1 and maxcut == len(seq):
             if getmultifa:
-                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                seq = seq.replace('qqq', 'n' * (len(seq) // 500))
             outfile.write(seq)
         elif mincut < maxcut:
             seq = seq[mincut-1:maxcut]
             if getmultifa:
-                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                seq = seq.replace('qqq', 'n' * (len(seq) // 500))
             outfile.write(seq)
         else:
             seq = seq[mincut-1:] + seq[:maxcut]
             if getmultifa:
-                seq = seq.replace('qqq', 'n' * (len(seq) / 500))
+                seq = seq.replace('qqq', 'n' * (len(seq) // 500))
             outfile.write(seq)
         if len(seq) == 0:
-            print 'There is no sequence in ' + genbank + '.'
+            sys.stderr.write('There is no sequence in ' + genbank + '.\n')
             return 0
         else:
             return 1
     except:
-        print genbank + ' does not exist.'
+        sys.stderr.write(genbank + ' does not exist.\n')
         return 0
 
 def getGCcontent(filename, windsize, step, mincut, maxcut):
@@ -10850,10 +10771,10 @@ def getGCcontent(filename, windsize, step, mincut, maxcut):
         gen.close()
         seq = seq.upper()
     except:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     if len(seq) == 0:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     if maxcut == 'Max':
         seq = seq[int(mincut)-1:]
@@ -10861,7 +10782,7 @@ def getGCcontent(filename, windsize, step, mincut, maxcut):
         seq = seq[int(mincut)-1:] + seq[:int(maxcut)+1]
     else:
         seq = seq[int(mincut)-1:int(maxcut)+1]
-    window1 = int(windsize) / 2
+    window1 = int(windsize) // 2
     window2 = int(windsize) - window1
     thearray = []
     for i in range(0, len(seq), int(step)):
@@ -10890,10 +10811,10 @@ def getGCskew(filename, windsize, step, mincut, maxcut):
         gen.close()
         seq = seq.upper()
     except:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     if len(seq) == 0:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     if maxcut == 'Max':
         seq = seq[int(mincut)-1:]
@@ -10901,7 +10822,7 @@ def getGCskew(filename, windsize, step, mincut, maxcut):
         seq = seq[int(mincut)-1:] + seq[:int(maxcut)+1]
     else:
         seq = seq[int(mincut)-1:int(maxcut)+1]
-    window1 = int(windsize) / 2
+    window1 = int(windsize) // 2
     window2 = int(windsize) - window1
     thearray = []
     for i in range(0, len(seq), int(step)):
@@ -10909,7 +10830,7 @@ def getGCskew(filename, windsize, step, mincut, maxcut):
         gcount = seqstring.count('G')
         ccount = seqstring.count('C')
         try:
-            thearray.append((gcount - ccount) * 1.0 / (gcount + ccount))
+            thearray.append((gcount - ccount) * 1.0 // (gcount + ccount))
         except:
             thearray.append(0)
     return thearray
@@ -10937,10 +10858,10 @@ def getCoverage(filename, filename2, mincut, maxcut):
                 seq += ''.join(line.split()[:-1])
         gen.close()
     except:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     if len(seq) == 0:
-        print 'Annotation file ' + filename + ' not valid.'
+        sys.stderr.write('Annotation file ' + filename + ' not valid.\n')
         return None
     seq = seq.lower()
     if maxcut == 'Max':
@@ -11043,7 +10964,7 @@ def getCustom(filename):
                     thearray[i].append(float(templine[i]))
         return thearray
     except:
-        print filename + ' not valid graph file.'
+        sys.stderr.write(filename + ' not valid graph file.\n')
         return None
 
 
@@ -11062,12 +10983,11 @@ def genBlast(inlist, cutlist):
         if isNewBlastDB():
             subprocess.Popen('makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) +
                              '.easyfig.fa', shell=True, env={"BLASTDB_LMDB_MAP_SIZE":"1000000"}).wait()
-            print 'makeblastdb -dbtype nucl -out temp_easyfig/tempdb -in temp_easyfig/' + str(i + 2) + '.easyfig.fa'
         elif isLegBlastDB():
             subprocess.Popen('formatdb -p F -t tempdb -n temp_easyfig/tempdb -i temp_easyfig/'
                              + str(i + 2) + '.easyfig.fa', shell=True).wait()
         else:
-            print 'Could not find BLAST.'
+            sys.stderr.write( 'Could not find BLAST.\n')
             sys.exit()
         if isNewBlastn():
             subprocess.Popen('blastn -task blastn -db temp_easyfig/tempdb -outfmt 6 -query temp_easyfig/' + str(i+1)
@@ -11078,7 +10998,7 @@ def genBlast(inlist, cutlist):
                          + str(i + 1) + '.easyfig.fa -o temp_easyfig/'
                          + str(i+1) + str(i+2) + '.easyfig.out', shell=True).wait()
         else:
-            print 'Could not find BLAST.'
+            sys.stderr.write( 'Could not find BLAST.\n')
             sys.exit()
         outlist.append(inlist[i])
         outlist.append('temp_easyfig/' + str(i+1) + str(i+2) + '.easyfig.out')
@@ -11088,7 +11008,7 @@ def genBlast(inlist, cutlist):
 def genTBlastX(inlist, cutlist):
     pwd = os.getcwd()
     if os.path.exists('temp_easyfig'):
-        print 'please run from a directory without the folder temp_easyfig'
+        sys.stderr.write('please run from a directory without the folder temp_easyfig\n')
         sys.exit()
     os.mkdir('temp_easyfig')
     os.chdir('temp_easyfig')
@@ -11109,7 +11029,7 @@ def genTBlastX(inlist, cutlist):
             subprocess.Popen('formatdb -p F -t tempdb -n tempdb -i '
                              + str(i + 2) + '.easyfig.fa', shell=True).wait()
         else:
-            print 'Could not find BLAST.'
+            sys.stderr.write('Could not find BLAST.\n')
             sys.exit()
         if isNewTblastx():
             subprocess.Popen('tblastx -db tempdb -outfmt 6 -query ' + str(i+1)
@@ -11120,7 +11040,7 @@ def genTBlastX(inlist, cutlist):
                          + str(i + 1) + '.easyfig.fa -o '
                          + str(i+1) + str(i+2) + '.easyfig.out', shell=True).wait()
         else:
-            print 'Could not find BLAST.'
+            sys.stderr.write('Could not find BLAST.\n')
             sys.exit()
         outlist.append(inlist[i])
         outlist.append(os.getcwd() + '/' + str(i+1) + str(i+2) + '.easyfig.out')
@@ -11147,7 +11067,6 @@ maxblastci = (100, 100, 100)
 drawfig1 = False
 drawfig2 = False
 drawfig3 = False
-compress = True
 reverseList = []
 featDict = {}
 glt = 5
@@ -11214,9 +11133,6 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
             drawfig2 = int(sys.argv[i+1])
         elif sys.argv[i] == '-f3':
             drawfig3 = sys.argv[i+1]
-        elif sys.argv[i] == '-uncomp':
-            if sys.argv[i+1] == 'T' or sys.argv[i+1] == 't' or sys.argv[i+1] == 'True' or sys.argv[i+1] == 'true':
-                compress = False
         elif sys.argv[i] == '-blastn':
             blastit = True
             lastflag -= 1
@@ -11309,7 +11225,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
                 gfilename = sys.argv[i+2]
                 lastflag += 1
             else:
-                print sys.argv[i+1] + ' not a valid graph type'
+                sys.stderr.write(sys.argv[i+1] + ' not a valid graph type\n')
         elif sys.argv[i] == '-wind_size':
             windsize = int(sys.argv[i+1])
         elif sys.argv[i] == '-step':
@@ -11363,7 +11279,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
             elif sys.argv[i+1] == 'both':
                 legend = 'Top & Bottom'
             else:
-                print 'Legend options are <single/double/top/bottom/both/None> (case sensitive), using None.'
+                sys.stderr.write('Legend options are <single/double/top/bottom/both/None> (case sensitive), using None.\n')
         elif sys.argv[i] == '-leg_name':
             legname = sys.argv[i+1]
     inlist = sys.argv[lastflag+1:]
@@ -11450,30 +11366,30 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
     else:
         'Please choolse -blastn or -tblastx flags to generate blast files, or use -blast_files to use previously generated files.'
     if filename == None:
-        print 'Please choose a file to write to (-o tag) and try agian.'
+        sys.stderr.write('Please choose a file to write to (-o tag) and try again.\n')
         sys.exit()
     if featDict == {} and not nofeat:
         featDict = {'CDS': ('arrow', (64, 224, 208))}
     if svg :
         x = drawsvg(filename, minlength, mineval, minIdent, inlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
-         compress, revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
+         revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
          blastoutline, cutlist, filter, legend, legname)
     else:
         x = draw(filename, minlength, mineval, minIdent, inlist, width, height1, height2,
          minblastc, maxblastc, minblastci, maxblastci, drawfig1, drawfig2, drawfig3,
-         compress, revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
+         revlist, featDict, glt, exont, genet, featlengths, aln, graphit,
          blastoutline, cutlist, filter, legend, legname)
     if (blastit or tblastit) and not keep_blast:
         shutil.rmtree('temp_easyfig')
-    print "Minimum blast hit reported: " + str(x) + '%'
+    sys.stdout.write("Minimum blast hit reported: " + str(x) + '%\n')
 
 elif len(sys.argv) == 1:
-    from Tkinter import *
-    import tkFileDialog
-    import tkMessageBox
-    import tkSimpleDialog
-    import tkColorChooser
+    from tkinter import *
+    from tkinter import filedialog as tkFileDialog
+    from tkinter import messagebox as tkMessageBox
+    from tkinter import simpledialog as tkSimpleDialog
+    from tkinter import colorchooser as tkColorChooser 
     class DDlistbox(Listbox):
         def __init__(self, master, **kw):
             kw['selectmode'] = SINGLE
@@ -11502,13 +11418,13 @@ elif len(sys.argv) == 1:
     app = App(root)
     root.mainloop()
 else:
-    print '''
+    sys.stdout.write('''
 Easyfig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 Supervisor: Dr. Scott Beatson   University of Queensland    03.12.2010
 
 License: GPLv3
 
-Version 2.2.3
+Version 2.2.4
 
 Usage: Easyfig.py [options] GenBank/EMBL/fasta GenBank/EMBL/fasta GenBank/EMBL/fasta ...
 
@@ -11550,7 +11466,6 @@ GENERAL OPTIONS:
 -blast_height <int>   height of blast hits in figure (pixels). [100]
 -f1 <T/F>             draw colour gradient figure for blast hits. [F]
 -f2 <int>             draw scale figure <int> base pairs long. [0]
--uncomp <T/F>         Do not compress figure. [F]
 -f  <string> [r g b] [arrow/rect/pointer/frame]
                       Draw features of type <string> (case sensitive) in the
                       color r g b with illustration type arrow, rectangle,
@@ -11629,4 +11544,4 @@ Reverse compliment ann2.embl. Writes as a SVG file.
 
 this script uses a modified version of Paul McGuire's (http://www.geocities.com/ptmcg/ RIP (geocities, not paul))
 bmp.py - module for constructing simple BMP graphics files
-'''
+''')
