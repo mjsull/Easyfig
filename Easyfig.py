@@ -415,8 +415,6 @@ class Color(object):
               ( self.grn <<  8 ) +
               ( self.red << 16 ) )
 
-  def __eq__( self, other ):
-    return (self is other) or (self.toLong == other.toLong)
 
   def lighten( self ):
     return Color(
