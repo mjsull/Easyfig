@@ -11115,7 +11115,7 @@ if len(sys.argv) >= 2 and sys.argv[1] != '--help' and sys.argv[1] != '-h' and sy
         if sys.argv[i] == '-o':
             filename = sys.argv[i+1]
         elif sys.argv[i] == '-e':
-            mineval = float(sys.arg[i+1])
+            mineval = float(sys.argv[i+1])
         elif sys.argv[i] == '-min_length':
             minlength = int(sys.argv[i+1])
         elif sys.argv[i] == '-i':
