@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # easyFig.py   Written by: Mitchell Sullivan   mjsull@gmail.com
 # Supervisor: Dr. Scott Beatson and Dr. Nico Petty University of Queensland
-# Version 2.2.4 08.11.2016
+# Version 3.0.0 08.11.2016
 # License: GPLv3
 
 import os
@@ -7654,9 +7654,9 @@ class App:
         self.maxcutlist = {}
         self.revlist = {}
         self.entrynum = 0
-        self.theTitle = Label(frame1, text='Easyfig 2.2.4', font='TkDefaultFont 24 bold')
+        self.theTitle = Label(frame1, text='Easyfig 3.0.0', font='Helvetica 22 bold')
         self.theTitle.grid(row=0, column=1, columnspan=3, padx=10, sticky='W')
-        self.annLab = Label(frame1, text="Annotation Files", font='TkDefaultFont 13 bold underline')
+        self.annLab = Label(frame1, text="Annotation Files", font='Helvetica 13 bold underline')
         self.annLab.grid(row=1, column=2, pady=10)
         self.scrollbar = Scrollbar(frame1, orient=VERTICAL)
         self.genlist = DDlistbox(frame1, yscrollcommand=self.scrollbar.set)
@@ -7667,7 +7667,7 @@ class App:
         self.scrollbar.config(command=self.yview)
         self.scrollbar.grid(row=2, column=1, rowspan=9, sticky=NS)
         self.genlist.grid(row=2, column=2, rowspan=9)
-        self.annLab = Label(frame1, text="Blast Files", font='TkDefaultFont 13 bold underline')
+        self.annLab = Label(frame1, text="Blast Files", font='Helvetica 13 bold underline')
         self.annLab.grid(row=1, column=3)
         self.blastlist.grid(row=2, column=3, rowspan=9)
         self.addgenbutton = Button(frame1, text='Add feature file', command=self.addfeat)
@@ -7701,7 +7701,7 @@ class App:
         self.filetypelabel.grid(row=18, column=2, columnspan=2, pady=5, sticky=W)
         self.filetypeentry = OptionMenu(frame1, self.filetype, 'Bitmap (bmp)', 'Vector file (svg)', 'Preview (shrink)', 'Preview (1:1)')
         self.filetypeentry.grid(row=18, column=2, columnspan=2, pady=5)
-        self.createFigure = Button(frame1, text="Create Figure", font='TkDefaultFont 12 bold', width=20, command=self.makeFigure)
+        self.createFigure = Button(frame1, text="Create Figure", font='Helvetica 12 bold', width=20, command=self.makeFigure)
         self.createFigure.grid(row=19, column=2, columnspan=2, rowspan=3, sticky='NS')
 
 
@@ -7724,8 +7724,12 @@ class App:
             self.opendefault()
 
     def yview(self, *args):
-        apply(self.genlist.yview, args)
-        apply(self.blastlist.yview, args)
+        if args[0] == "moveto":
+            self.genlist.yview_moveto(args[1])
+            self.blastlist.yview_moveto(args[1])
+        else:
+            self.genlist.yview_scroll(args[1], args[2])
+            self.blastlist.yview_scroll(args[1], args[2])
 
     def addfolder(self):
         tempfolder = tkFileDialog.askdirectory(title='Please select a directory with feature files.')
@@ -7754,7 +7758,7 @@ class App:
                 return
             self.renumbergen()
         filename = tkFileDialog.askopenfilename(filetypes = [('genbank/embl/fasta', ('*.gbk', '*.embl', '*.gb', '*.fa', '*.fna', '*.dna', '*.fas', '*.fasta')), ('All files','*')])
-        if filename == '':
+        if filename == ():
             return
         self.entrynum += 1
         entryname = '%02d' % self.entrynum + '. ' + filename
@@ -8033,7 +8037,7 @@ class App:
     def openOptions(self):
         try:
             filename = tkFileDialog.askopenfilename(filetypes = [('easycfg', '*.easycfg'), ('All files','*')])
-            if filename == '':
+            if filename == '' or filename == ():
                 return
             openfile = open(filename)
             templist = openfile.readline().rstrip().split('\t')
@@ -8305,11 +8309,11 @@ class App:
             pass
         self.aboutpanel = Toplevel()
         self.frame7 = Frame(self.aboutpanel)
-        self.about1label = Label(self.frame7, text='Easyfig', font='TkDefaultFont 13 bold')
+        self.about1label = Label(self.frame7, text='Easyfig', font='Helvetica 13 bold')
         self.about1label.grid(row=0, column=0)
         self.about2label = Label(self.frame7, text='Easyfig is a Python application for creating linear\n\
 comparison figures of multiple genomic loci\n with an easy-to-use graphical user interface (GUI).\n\n\
-Version 2.2.4\n\nIf Easyfig is used to generate figures for publication,\n\
+Version 3.0.0\n\nIf Easyfig is used to generate figures for publication,\n\
 please cite our paper:\n\n\
 Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualiser.\nBioinformatics; 27 (7): 1009-1010')
         self.about2label.grid(row=1, column=0)
@@ -8322,7 +8326,7 @@ Sullivan MJ, Petty NK, Beatson SA. (2011)\nEasyfig: a genome comparison visualis
             pass
         self.supportpanel = Toplevel()
         self.frame9 = Frame(self.supportpanel)
-        self.about1label1 = Label(self.frame9, text='Easyfig', font='TkDefaultFont 13 bold')
+        self.about1label1 = Label(self.frame9, text='Easyfig', font='Helvetica 13 bold')
         self.about1label1.grid(row=0, column=0)
         self.supportlabel2 = Label(self.frame9, text='written by Mitchell Sullivan - mjsull@gmail.com\n\
 To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
@@ -8981,7 +8985,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.figureoptionswindow = Toplevel()
         self.figureoptionswindow.title('Figure')
         self.frame2 = Frame(self.figureoptionswindow)
-        self.mainoptionslab = Label(self.frame2, text='Figure Options', font='TkDefaultFont 13 bold underline')
+        self.mainoptionslab = Label(self.frame2, text='Figure Options', font='Helvetica 13 bold underline')
         self.mainoptionslab.grid(row=0, column=0)
         self.figwidthlabel = Label(self.frame2, text='Width of Figure (pixels):')
         self.figwidthlabel.grid(row=1, column=0)
@@ -9004,7 +9008,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.alnentry = OptionMenu(self.frame2, self.aln, 'left', 'centre', 'right', 'best blast')
         self.alnentry.config(width=5)
         self.alnentry.grid(row=5, column=1, sticky=EW)
-        self.legendoptionslab = Label(self.frame2, text='Legend Options', font='TkDefaultFont 13 bold')
+        self.legendoptionslab = Label(self.frame2, text='Legend Options', font='Helvetica 13 bold')
         self.legendoptionslab.grid(row=6, column=0)
         self.drawfig1label = Label(self.frame2, text='Draw Blast identity legend?')
         self.drawfig1label.grid(row=7, column=0)
@@ -9039,7 +9043,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.blastoptionswindow = Toplevel()
         self.blastoptionswindow.title('Blast')
         self.frame3 = Frame(self.blastoptionswindow)
-        self.blastoptionslab = Label(self.frame3, text='Blast Options', font='TkDefaultFont 13 bold underline')
+        self.blastoptionslab = Label(self.frame3, text='Blast Options', font='Helvetica 13 bold underline')
         self.blastoptionslab.grid(row=0, column=0)
         self.minlengthlabel = Label(self.frame3, text='Min. length:')
         self.minlengthlabel.grid(row=1, column=0)
@@ -9102,7 +9106,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.annotateoptionswindow = Toplevel()
         self.annotateoptionswindow.title('Annotation')
         self.frame4 = Frame(self.annotateoptionswindow)
-        self.annotLab = Label(self.frame4, text='Annotation Options', font='TkDefaultFont 13 bold underline')
+        self.annotLab = Label(self.frame4, text='Annotation Options', font='Helvetica 13 bold underline')
         self.annotLab.grid(row=0, column=0)
         self.leglabel = Label(self.frame4, text='Feature Labels:')
         self.leglabel.grid(row=1, column=0)
@@ -9123,11 +9127,11 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.genetentry = Entry(self.frame4, textvariable=self.genetvar)
         self.genetentry.grid(row=4, column=1, columnspan=4)
 
-        self.featlabel = Label(self.frame4, text='Include following features', font='TkDefaultFont 13 bold')
+        self.featlabel = Label(self.frame4, text='Include following features', font='Helvetica 13 bold')
         self.featlabel.grid(row=5, column=0)
-        self.featcolour = Label(self.frame4, text='Colour', font='TkDefaultFont 13 bold')
+        self.featcolour = Label(self.frame4, text='Colour', font='Helvetica 13 bold')
         self.featcolour.grid(row=5, column=1, columnspan=2)
-        self.featshape = Label(self.frame4, text='type', font='TkDefaultFont 13 bold')
+        self.featshape = Label(self.frame4, text='type', font='Helvetica 13 bold')
         self.featshape.grid(row=5, column=3, columnspan=2)
 
         self.geneflabel = Label(self.frame4, text='gene')
@@ -9206,7 +9210,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.graphoptionswindow = Toplevel()
         self.graphoptionswindow.title('Graph')
         self.frame5 = Frame(self.graphoptionswindow)
-        self.graphlabel = Label(self.frame5, text='Graph options', font='TkDefaultFont 13 bold')
+        self.graphlabel = Label(self.frame5, text='Graph options', font='Helvetica 13 bold')
         self.graphlabel.grid(row=0, column=0)
 
         self.graphtypelabel = Label(self.frame5, text='Graph:')
@@ -10211,17 +10215,17 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.annwindow = Toplevel()
         self.frame6 = Frame(self.annwindow)
         self.annwindow.title('Subregions')
-        self.frangelab = Label(self.frame6, text='Range', font='TkDefaultFont 13 bold')
+        self.frangelab = Label(self.frame6, text='Range', font='Helvetica 13 bold')
         self.frangelab.grid(row=0, column=2, columnspan=3)
-        self.ffilelab = Label(self.frame6, text='Ann. file', font='TkDefaultFont 13 bold')
+        self.ffilelab = Label(self.frame6, text='Ann. file', font='Helvetica 13 bold')
         self.ffilelab.grid(row=1, column=1, pady=10)
-        self.fminlab = Label(self.frame6, text='Min', font='TkDefaultFont 13 bold')
+        self.fminlab = Label(self.frame6, text='Min', font='Helvetica 13 bold')
         self.fminlab.grid(row=1, column=2, pady=10)
         self.fdotdot = Label(self.frame6, text=' .. ')
         self.fdotdot.grid(row=1, column=3)
-        self.fmaxlab = Label(self.frame6, text='Max', font='TkDefaultFont 13 bold')
+        self.fmaxlab = Label(self.frame6, text='Max', font='Helvetica 13 bold')
         self.fmaxlab.grid(row=1, column=4, pady=10)
-        self.frevlab = Label(self.frame6, text='Reverse', font='TkDefaultFont 13 bold')
+        self.frevlab = Label(self.frame6, text='Reverse', font='Helvetica 13 bold')
         self.frevlab.grid(row=1, column=5, pady=10)
         self.scrollbar2 = Scrollbar(self.frame6, orient=VERTICAL)
         self.fgenlist = Listbox(self.frame6, yscrollcommand=self.scrollbar2.set, exportselection=0)
@@ -10375,7 +10379,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.doublecutswin = Toplevel(self.frame6)
         self.doublecutswin.title('Change subregion')
         self.frame10 = Frame(self.doublecutswin)
-        self.dublabel1 = Label(self.frame10, text='Modify file ' + self.fgenlist.get(self.doublecutsel)[:3], font='TkDefaultFont 13 bold')
+        self.dublabel1 = Label(self.frame10, text='Modify file ' + self.fgenlist.get(self.doublecutsel)[:3], font='Helvetica 13 bold')
         self.dublabel1.grid(row=0, column=0, pady=5)
         self.dublabel2 = Label(self.frame10, text='Min Cutoff:')
         self.dublabel2.grid(row=1, column=0)
@@ -10491,7 +10495,7 @@ To submit a bug please visit https://github.com/mjsull/Easyfig/issues.')
         self.downloadFile.write(block)
         if self.thecount * 100 / self.totalBytes != (self.thecount + len(block)) * 100 / self.totalBytes:
             try:
-                self.processLab.config(text='Finding Blast... Done\nDownloading... ' + str((self.thecount + len(block)) * 100 / self.totalBytes) + '%')
+                self.processLab.config(text='Finding Blast... Done\nDownloading... ' + str((self.thecount + len(block)) * 100 // self.totalBytes) + '%')
             except:
                 pass
         self.thecount += len(block)
@@ -11387,7 +11391,7 @@ elif len(sys.argv) == 1:
     from tkinter import filedialog as tkFileDialog
     from tkinter import messagebox as tkMessageBox
     from tkinter import simpledialog as tkSimpleDialog
-    from tkinter import colorchooser as tkColorChooser 
+    from tkinter import colorchooser as tkColorChooser
     class DDlistbox(Listbox):
         def __init__(self, master, **kw):
             kw['selectmode'] = SINGLE
@@ -11411,8 +11415,13 @@ elif len(sys.argv) == 1:
                 self.curIndex = i
     abortCaptain = False
     root = Tk()
+    try:
+        import sv_ttk
+        sv_ttk.set_theme("light")
+    except:
+        pass
     root.title('Easyfig.py')
-    root.option_add('*Font', 'TkDefaultFont 12')
+    root.option_add('*Font', 'Helvetica 12')
     app = App(root)
     root.mainloop()
 else:
@@ -11422,7 +11431,7 @@ Supervisor: Dr. Scott Beatson   University of Queensland    03.12.2010
 
 License: GPLv3
 
-Version 2.2.4
+Version 3.0.0
 
 Usage: Easyfig.py [options] GenBank/EMBL/fasta GenBank/EMBL/fasta GenBank/EMBL/fasta ...
 
